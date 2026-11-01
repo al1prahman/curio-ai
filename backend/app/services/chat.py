@@ -101,7 +101,7 @@ async def ask_question(
     organization_id: uuid.UUID,
     question: str,
 ) -> dict:
-    """Full RAG chat flow: save question -> retrieve -> generate -> save answer + citations."""
+    """Full RAG chat flow: save Q -> retrieve -> generate -> save A + citations."""
     start_time = time.time()
 
     # 1. Save user message
@@ -114,11 +114,20 @@ async def ask_question(
     await db.commit()
     await db.refresh(user_msg)
 
-    # 2. Embed query
+    # 2. Load recent conversation context (last 6 messages for memory)
+    recent_result = await db.execute(
+        select(Message)
+        .where(Message.conversation_id == conversation_id, Message.id != user_msg.id)
+        .order_by(Message.created_at.desc())
+        .limit(6)
+    )
+    recent_messages = list(reversed(recent_result.scalars().all()))
+
+    # 3. Embed query
     embedding_service = EmbeddingService()
     query_vector = embedding_service.embed_query(question)
 
-    # 3. Retrieve relevant chunks (org-isolated)
+    # 4. Retrieve relevant chunks (org-isolated)
     vector_store = VectorStore()
     chunks = vector_store.search(
         query_vector=query_vector,
@@ -127,7 +136,7 @@ async def ask_question(
         score_threshold=settings.RAG_SIMILARITY_THRESHOLD,
     )
 
-    # 4. Enrich chunks with document names + chunk PKs
+    # 5. Enrich chunks with document names + chunk PKs
     enriched = []
     for chunk in chunks:
         doc_result = await db.execute(
@@ -135,7 +144,6 @@ async def ask_question(
         )
         doc_name = doc_result.scalar_one_or_none() or "Unknown"
 
-        # Look up DocumentChunk PK by vector_id (Qdrant point id = vector_id)
         chunk_result = await db.execute(
             select(DocumentChunk.id).where(DocumentChunk.vector_id == str(chunk["id"]))
         )
@@ -143,9 +151,9 @@ async def ask_question(
 
         enriched.append({**chunk, "document_name": doc_name, "chunk_pk": chunk_pk})
 
-    # 5. Build prompt and generate
+    # 6. Build prompt with conversation history + retrieved context
     llm = LLMService()
-    prompt = build_rag_prompt(question, enriched)
+    prompt = build_rag_prompt(question, enriched, recent_messages)
     result = llm.generate(SYSTEM_PROMPT, prompt)
 
     latency_ms = int((time.time() - start_time) * 1000)
