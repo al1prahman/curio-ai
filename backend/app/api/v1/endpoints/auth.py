@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
+from datetime import datetime, timezone
 from jwt import InvalidTokenError
 from sqlalchemy import select
 
@@ -22,6 +23,8 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/login", response_model=TokenResponse)
 async def login(data: LoginRequest, db: DbSession) -> TokenResponse:
+    from app.services.audit import log_action
+
     user = await authenticate_user(db, data.email, data.password)
 
     if user is None:
@@ -29,6 +32,18 @@ async def login(data: LoginRequest, db: DbSession) -> TokenResponse:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
+
+    user.last_login_at = datetime.now(timezone.utc)
+    await db.commit()
+
+    await log_action(
+        db,
+        organization_id=user.organization_id,
+        action="user.login",
+        actor_id=user.id,
+        resource_type="user",
+        resource_id=user.id,
+    )
 
     return TokenResponse(
         access_token=create_access_token(user.id, user.organization_id, user.role),

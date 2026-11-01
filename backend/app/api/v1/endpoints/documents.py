@@ -60,6 +60,20 @@ async def upload_docs(
     uploaded, skipped = await upload_documents(
         db, current_user.organization_id, current_user.id, file_data, collection_id
     )
+
+    # Audit log
+    from app.services.audit import log_action
+    for doc in uploaded:
+        await log_action(
+            db,
+            organization_id=current_user.organization_id,
+            action="document.upload",
+            actor_id=current_user.id,
+            resource_type="document",
+            resource_id=doc.id,
+            metadata={"filename": doc.name, "size": doc.file_size},
+        )
+
     return UploadResponse(
         uploaded=[DocumentResponse.model_validate(d) for d in uploaded],
         skipped=skipped,
@@ -136,4 +150,16 @@ async def delete_document_detail(
 ) -> DocumentResponse:
     doc = await get_document(db, document_id, current_user.organization_id)
     doc = await delete_document(db, doc)
+
+    from app.services.audit import log_action
+    await log_action(
+        db,
+        organization_id=current_user.organization_id,
+        action="document.delete",
+        actor_id=current_user.id,
+        resource_type="document",
+        resource_id=doc.id,
+        metadata={"filename": doc.name},
+    )
+
     return DocumentResponse.model_validate(doc)

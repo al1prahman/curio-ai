@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.v1.endpoints.analytics import router as analytics_router
 from app.api.v1.endpoints.auth import router as auth_router
 from app.api.v1.endpoints.chat import router as chat_router
 from app.api.v1.endpoints.collections import router as collections_router
@@ -13,6 +14,7 @@ api_router.include_router(users_router)
 api_router.include_router(collections_router)
 api_router.include_router(documents_router)
 api_router.include_router(chat_router)
+api_router.include_router(analytics_router)
 
 
 @api_router.get("/ping")
