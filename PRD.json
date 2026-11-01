@@ -1,7 +1,7 @@
 {
   "project": {
-    "name": "NexusAI",
-    "full_name": "NexusAI - Enterprise Knowledge & AI Intelligence Platform",
+    "name": "CurioAI",
+    "full_name": "CurioAI - Enterprise Knowledge & AI Intelligence Platform",
     "version": "1.0.0",
     "status": "planned",
     "type": "Web Application",
@@ -107,7 +107,7 @@
         "description": "Administrators need insights into document usage, user activity, and AI system performance."
       }
     ],
-    "proposed_solution": "NexusAI combines document management, semantic search, Retrieval Augmented Generation, role-based authorization, and analytics into one integrated platform."
+    "proposed_solution": "CurioAI combines document management, semantic search, Retrieval Augmented Generation, role-based authorization, and analytics into one integrated platform."
   },
 
   "target_users": {
@@ -791,7 +791,7 @@
   },
 
   "rag_pipeline": {
-    "pipeline_name": "NexusAI Retrieval Augmented Generation Pipeline",
+    "pipeline_name": "CurioAI Retrieval Augmented Generation Pipeline",
     "stages": [
       {
         "step": 1,
@@ -1926,7 +1926,7 @@
       "phase": 8,
       "name": "Testing, Deployment, and Documentation",
       "priority": "MUST",
-      "goal": "Prepare NexusAI for a demonstrable production-style deployment.",
+      "goal": "Prepare CurioAI for a demonstrable production-style deployment.",
       "tasks": [
         "Complete unit tests.",
         "Complete integration tests.",
@@ -2071,7 +2071,7 @@
   },
 
   "repository_structure": {
-    "root": "nexusai/",
+    "root": "curio-ai/",
     "directories": {
       "frontend": {
         "path": "frontend/",
