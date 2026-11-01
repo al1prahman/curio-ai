@@ -1,5 +1,5 @@
 import uuid
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
@@ -59,6 +59,6 @@ async def get_all_feedback(
     db: DbSession,
     current_user: Annotated[User, Depends(require_permission("analytics.view"))],
     limit: int = Query(50, ge=1, le=200),
-) -> dict:
+) -> dict[str, Any]:
     items = await list_feedback(db, current_user.organization_id, limit)
     return {"items": items}

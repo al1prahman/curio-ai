@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.document import Document, DocumentPermission
+from app.models.document import DocumentPermission
 
 
 async def get_document_permissions(

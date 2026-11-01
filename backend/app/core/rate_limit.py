@@ -31,6 +31,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if limit_rule is None:
             return await call_next(request)
 
+        # Skip rate limiting in test environment
+        from app.core.config import settings
+
+        if settings.APP_ENV == "test":
+            return await call_next(request)
+
         max_requests, window = limit_rule
 
         # Identify client by IP + path

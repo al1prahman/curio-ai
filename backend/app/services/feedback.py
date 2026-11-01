@@ -1,4 +1,5 @@
 import uuid
+from typing import Any
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -72,7 +73,7 @@ async def list_feedback(
     db: AsyncSession,
     organization_id: uuid.UUID,
     limit: int = 50,
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """List all feedback for admin review."""
     from app.models.conversation import Conversation
 

@@ -17,7 +17,7 @@ router = APIRouter(prefix="/analytics", tags=["Analytics"])
 async def get_overview(
     db: DbSession,
     current_user: Annotated[User, Depends(require_permission("analytics.view"))],
-) -> dict:
+) -> dict[str, Any]:
     """Dashboard statistics for the current organization."""
     from app.services.redis_service import cache_get, cache_set
 
@@ -25,7 +25,7 @@ async def get_overview(
     cache_key = f"analytics:overview:{current_user.organization_id}"
     cached = await cache_get(cache_key)
     if cached is not None:
-        return cached
+        return dict(cached)
 
     org_id = current_user.organization_id
 
