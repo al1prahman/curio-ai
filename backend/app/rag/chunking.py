@@ -71,9 +71,29 @@ def chunk_text(
                                     token_count=_estimate_tokens(current),
                                 )
                             )
-                        # Overlap: keep last chunk_overlap chars
-                        overlap_text = current[-chunk_overlap:] if current else ""
-                        current = f"{overlap_text} {sent}".strip()
+                        # If a single sentence is still too long, split by words
+                        if len(sent) > chunk_size:
+                            words = sent.split()
+                            current = ""
+                            for word in words:
+                                candidate = f"{current} {word}" if current else word
+                                if len(candidate) <= chunk_size:
+                                    current = candidate
+                                else:
+                                    if current.strip():
+                                        chunks.append(
+                                            Chunk(
+                                                content=current.strip(),
+                                                chunk_index=len(chunks),
+                                                page_number=current_start_page,
+                                                token_count=_estimate_tokens(current),
+                                            )
+                                        )
+                                    overlap_text = current[-chunk_overlap:] if current else ""
+                                    current = f"{overlap_text} {word}".strip()
+                        else:
+                            overlap_text = current[-chunk_overlap:] if current else ""
+                            current = f"{overlap_text} {sent}".strip()
                 current_start_page = page_number
             else:
                 # Overlap from previous chunk
