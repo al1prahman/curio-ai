@@ -13,13 +13,19 @@ from qdrant_client.models import (
 from app.core.config import settings
 
 
+def _strip_scheme(url: str) -> str:
+    return url.replace("http://", "").replace("https://", "")
+
 class VectorStore:
     """Qdrant vector store with org/document metadata filtering."""
 
     COLLECTION_NAME = "curio_chunks"
 
     def __init__(self) -> None:
-        self._client = QdrantClient(url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY or None)
+        self._client = QdrantClient(
+            url=settings.QDRANT_URL,
+            api_key=settings.QDRANT_API_KEY or None,
+        )
         self._ensure_collection()
 
     def _ensure_collection(self) -> None:

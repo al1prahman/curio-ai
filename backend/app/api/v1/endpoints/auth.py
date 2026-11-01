@@ -1,5 +1,6 @@
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, HTTPException, status
-from datetime import datetime, timezone
 from jwt import InvalidTokenError
 from sqlalchemy import select
 
@@ -33,7 +34,7 @@ async def login(data: LoginRequest, db: DbSession) -> TokenResponse:
             detail="Invalid email or password",
         )
 
-    user.last_login_at = datetime.now(timezone.utc)
+    user.last_login_at = datetime.now(UTC)
     await db.commit()
 
     await log_action(
@@ -71,7 +72,7 @@ async def refresh_token(data: RefreshRequest, db: DbSession) -> TokenResponse:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid refresh token",
-        )
+        ) from None
 
     if payload.get("type") != "refresh":
         raise HTTPException(

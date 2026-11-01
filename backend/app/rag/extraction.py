@@ -1,7 +1,7 @@
 import io
 
-from pypdf import PdfReader
 from docx import Document as DocxDocument
+from pypdf import PdfReader
 
 
 class ExtractedPage:

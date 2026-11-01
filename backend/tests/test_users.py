@@ -1,6 +1,5 @@
 """RBAC and user management tests."""
 
-import pytest
 
 
 class TestUserCRUD:

@@ -1,11 +1,14 @@
 import hashlib
 import io
 import uuid
-from pathlib import Path
 
 import minio
 
 from app.core.config import settings
+
+
+def _strip_scheme(url: str) -> str:
+    return url.replace("http://", "").replace("https://", "")
 
 
 class StorageService:
@@ -13,7 +16,7 @@ class StorageService:
 
     def __init__(self) -> None:
         self._client = minio.Minio(
-            endpoint=settings.OBJECT_STORAGE_ENDPOINT.replace("http://", "").replace("https://", ""),
+            endpoint=_strip_scheme(settings.OBJECT_STORAGE_ENDPOINT),
             access_key=settings.OBJECT_STORAGE_ACCESS_KEY,
             secret_key=settings.OBJECT_STORAGE_SECRET_KEY,
             secure=settings.OBJECT_STORAGE_ENDPOINT.startswith("https"),

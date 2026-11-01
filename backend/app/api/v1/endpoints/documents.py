@@ -1,9 +1,9 @@
+import io
 import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
 from fastapi.responses import StreamingResponse
-import io
 
 from app.api.deps import DbSession, require_permission
 from app.models.user import User
@@ -27,7 +27,9 @@ router = APIRouter(prefix="/documents", tags=["Documents"])
 @router.get("", response_model=DocumentListResponse)
 async def get_documents(
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("documents.view"))],
+    current_user: Annotated[
+        User, Depends(require_permission("documents.view"))
+    ],
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     search: str | None = None,
@@ -84,7 +86,9 @@ async def upload_docs(
 async def get_document_detail(
     document_id: uuid.UUID,
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("documents.view"))],
+    current_user: Annotated[
+        User, Depends(require_permission("documents.view"))
+    ],
 ) -> DocumentResponse:
     doc = await get_document(db, document_id, current_user.organization_id)
     return DocumentResponse.model_validate(doc)
@@ -94,7 +98,9 @@ async def get_document_detail(
 async def get_document_status(
     document_id: uuid.UUID,
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("documents.view"))],
+    current_user: Annotated[
+        User, Depends(require_permission("documents.view"))
+    ],
 ) -> DocumentStatusResponse:
     doc = await get_document(db, document_id, current_user.organization_id)
     return DocumentStatusResponse(
@@ -108,7 +114,9 @@ async def get_document_status(
 async def download_document(
     document_id: uuid.UUID,
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("documents.view"))],
+    current_user: Annotated[
+        User, Depends(require_permission("documents.view"))
+    ],
 ) -> StreamingResponse:
     doc = await get_document(db, document_id, current_user.organization_id)
     data, filename, content_type = await get_document_file(db, doc)
@@ -123,7 +131,9 @@ async def download_document(
 async def process_document_endpoint(
     document_id: uuid.UUID,
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("documents.view"))],
+    current_user: Annotated[
+        User, Depends(require_permission("documents.view"))
+    ],
 ) -> DocumentResponse:
     from app.rag.pipeline import process_document
 
@@ -134,7 +144,9 @@ async def process_document_endpoint(
 @router.post("/process-all", response_model=dict)
 async def process_all_documents(
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("documents.view"))],
+    current_user: Annotated[
+        User, Depends(require_permission("documents.view"))
+    ],
 ) -> dict:
     from app.rag.pipeline import process_pending_documents
 

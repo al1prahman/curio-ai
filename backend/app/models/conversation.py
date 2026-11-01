@@ -70,7 +70,9 @@ class MessageSource(UUIDMixin, Base):
         nullable=False,
         index=True,
     )
-    chunk_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("document_chunks.id"), nullable=False)
+    chunk_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("document_chunks.id"), nullable=False
+    )
     page_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     excerpt: Mapped[str | None] = mapped_column(Text, nullable=True)
     relevance_score: Mapped[float | None] = mapped_column(Float, nullable=True)

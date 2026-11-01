@@ -39,7 +39,7 @@ async def test_engine():
 
 
 @pytest.fixture
-async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
+async def db_session(test_engine) -> AsyncGenerator[AsyncSession]:
     session_factory = async_sessionmaker(test_engine, expire_on_commit=False)
     async with session_factory() as session:
         yield session
@@ -47,7 +47,7 @@ async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest.fixture
-async def client(test_engine) -> AsyncGenerator[AsyncClient, None]:
+async def client(test_engine) -> AsyncGenerator[AsyncClient]:
     session_factory = async_sessionmaker(test_engine, expire_on_commit=False)
 
     async def override_get_db():

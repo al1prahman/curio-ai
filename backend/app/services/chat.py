@@ -174,7 +174,7 @@ async def ask_question(
 
     # 7. Save source citations
     sources = []
-    for i, chunk in enumerate(enriched, start=1):
+    for _i, chunk in enumerate(enriched, start=1):
         if chunk.get("chunk_pk") is None:
             continue
         source = MessageSource(

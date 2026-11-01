@@ -30,7 +30,9 @@ router = APIRouter(prefix="/chat", tags=["AI Chat"])
 async def create_new_conversation(
     data: ConversationCreate,
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("chat.use"))],
+    current_user: Annotated[
+        User, Depends(require_permission("chat.use"))
+    ],
 ) -> ConversationResponse:
     conv = await create_conversation(db, current_user.organization_id, current_user.id, data.title)
     return ConversationResponse.model_validate(conv)
@@ -39,7 +41,9 @@ async def create_new_conversation(
 @router.get("/conversations", response_model=list[ConversationResponse])
 async def get_conversations(
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("chat.view_own"))],
+    current_user: Annotated[
+        User, Depends(require_permission("chat.view_own"))
+    ],
 ) -> list[ConversationResponse]:
     convs = await list_conversations(db, current_user.id, current_user.organization_id)
     return [ConversationResponse.model_validate(c) for c in convs]
@@ -49,7 +53,9 @@ async def get_conversations(
 async def get_conversation_messages(
     conversation_id: uuid.UUID,
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("chat.view_own"))],
+    current_user: Annotated[
+        User, Depends(require_permission("chat.view_own"))
+    ],
 ) -> list[MessageResponse]:
     conv = await get_conversation(db, conversation_id, current_user.id, current_user.organization_id)
     messages = await get_messages(db, conv.id)
@@ -61,7 +67,9 @@ async def rename_conversation_endpoint(
     conversation_id: uuid.UUID,
     data: ConversationRename,
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("chat.view_own"))],
+    current_user: Annotated[
+        User, Depends(require_permission("chat.view_own"))
+    ],
 ) -> ConversationResponse:
     conv = await get_conversation(db, conversation_id, current_user.id, current_user.organization_id)
     conv = await rename_conversation(db, conv, data.title)
@@ -72,7 +80,9 @@ async def rename_conversation_endpoint(
 async def delete_conversation_endpoint(
     conversation_id: uuid.UUID,
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("chat.view_own"))],
+    current_user: Annotated[
+        User, Depends(require_permission("chat.view_own"))
+    ],
 ) -> None:
     conv = await get_conversation(db, conversation_id, current_user.id, current_user.organization_id)
     await delete_conversation(db, conv)
@@ -86,7 +96,9 @@ async def ask_question_endpoint(
     conversation_id: uuid.UUID,
     data: AskQuestionRequest,
     db: DbSession,
-    current_user: Annotated[User, Depends(require_permission("chat.use"))],
+    current_user: Annotated[
+        User, Depends(require_permission("chat.use"))
+    ],
 ) -> AskQuestionResponse:
     conv = await get_conversation(db, conversation_id, current_user.id, current_user.organization_id)
     result = await ask_question(

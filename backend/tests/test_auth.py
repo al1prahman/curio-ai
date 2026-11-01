@@ -1,6 +1,5 @@
 """Authentication tests."""
 
-import pytest
 
 
 class TestLogin:

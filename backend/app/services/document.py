@@ -1,4 +1,5 @@
 import uuid
+from datetime import UTC
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
@@ -7,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.document import Document
 from app.services.storage import (
     ALLOWED_MIME_TYPES,
-    MAX_FILES_PER_REQUEST,
     MAX_FILE_SIZE,
+    MAX_FILES_PER_REQUEST,
     StorageService,
     compute_checksum,
 )
@@ -133,9 +134,9 @@ async def upload_documents(
 
 
 async def delete_document(db: AsyncSession, doc: Document) -> Document:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    doc.deleted_at = datetime.now(timezone.utc)
+    doc.deleted_at = datetime.now(UTC)
     await db.commit()
     await db.refresh(doc)
     return doc

@@ -68,7 +68,7 @@ async def process_document(
         # 5. Store in Qdrant
         vector_store = VectorStore()
         qdrant_chunks = []
-        for chunk, vector in zip(all_chunks, vectors):
+        for chunk, vector in zip(all_chunks, vectors, strict=False):
             qdrant_chunks.append(
                 {
                     "id": chunk.id,
@@ -83,7 +83,7 @@ async def process_document(
         vector_store.upsert_chunks(qdrant_chunks)
 
         # 6. Store chunk metadata in PostgreSQL
-        for chunk, vector in zip(all_chunks, vectors):
+        for chunk in all_chunks:
             db_chunk = DocumentChunk(
                 document_id=document_id,
                 organization_id=organization_id,

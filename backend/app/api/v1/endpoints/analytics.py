@@ -1,9 +1,8 @@
-import uuid
+from datetime import UTC
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import DbSession, require_permission
 from app.models.audit import AuditLog
@@ -68,10 +67,10 @@ async def get_usage(
     days: int = Query(7, ge=1, le=90),
 ) -> dict:
     """AI usage metrics over the last N days."""
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
     org_id = current_user.organization_id
-    since = datetime.now(timezone.utc) - timedelta(days=days)
+    since = datetime.now(UTC) - timedelta(days=days)
 
     msg_result = await db.execute(
         select(

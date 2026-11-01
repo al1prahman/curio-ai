@@ -47,7 +47,8 @@ dev = [
 
 [tool.ruff]
 target-version = "py313"
-line-length = 100
+line-length = 120
+extend-exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 select = [
@@ -60,6 +61,10 @@ select = [
     "B",   # flake8-bugbear
     "SIM", # flake8-simplify
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# FastAPI's File()/Form() in defaults is the standard dependency injection pattern
+"app/api/v1/endpoints/documents.py" = ["B008"]
 
 [tool.mypy]
 python_version = "3.13"
