@@ -4,7 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Search, Upload } from "lucide-react";
 import { api, type Document } from "@/lib/api";
 import AppShell from "@/components/AppShell";
-import { Badge, Button, Card, EmptyState, ErrorState, LoadingState } from "@/components/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  PageHeader,
+} from "@/components/ui";
 
 const STATUS_TONES: Record<string, "neutral" | "warn" | "accent" | "ok" | "bad"> = {
   PENDING: "warn",
@@ -55,12 +63,15 @@ export default function DocumentsPage() {
     try {
       const formData = new FormData();
       for (let i = 0; i < files.length; i++) formData.append("files", files[i]);
-      const result = await api.upload<{ uploaded: Document[]; skipped: { filename: string; reason: string }[] }>(
-        "/documents/upload",
-        formData
-      );
+      const result = await api.upload<{
+        uploaded: Document[];
+        skipped: { filename: string; reason: string }[];
+      }>("/documents/upload", formData);
+
       if (result.skipped.length > 0) {
-        alert(`Skipped:\n${result.skipped.map((s) => `- ${s.filename}: ${s.reason}`).join("\n")}`);
+        alert(
+          `Skipped:\n${result.skipped.map((s) => `- ${s.filename}: ${s.reason}`).join("\n")}`
+        );
       }
       await load();
     } catch (err) {
@@ -90,51 +101,45 @@ export default function DocumentsPage() {
 
   return (
     <AppShell>
-      <div className="p-8 max-w-6xl">
-        {/* Header */}
-        <header className="mb-6 flex items-end justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-ink tracking-tight">Documents</h1>
-            <p className="text-sm text-ink-2 mt-1">
-              {total} document{total !== 1 ? "s" : ""} in your knowledge base
-            </p>
-          </div>
-          <div>
-            <input
-              ref={fileRef}
-              type="file"
-              multiple
-              accept=".pdf,.docx,.txt"
-              onChange={handleUpload}
-              className="hidden"
-              id="file-upload"
-            />
-            <label
-              htmlFor="file-upload"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-btn hover:bg-accent-hover transition-colors cursor-pointer"
-            >
-              <Upload size={14} strokeWidth={2} />
-              {uploading ? "Uploading…" : "Upload"}
-            </label>
-          </div>
-        </header>
+      <div className="p-6 max-w-5xl">
+        <PageHeader
+          title="Documents"
+          description={`${total} document${total !== 1 ? "s" : ""} in your knowledge base`}
+          actions={
+            <>
+              <input
+                ref={fileRef}
+                type="file"
+                multiple
+                accept=".pdf,.docx,.txt"
+                onChange={handleUpload}
+                className="hidden"
+                id="file-upload"
+              />
+              <label
+                htmlFor="file-upload"
+                className="inline-flex items-center gap-1.5 h-8 px-3 bg-ink text-white text-[13px] font-medium rounded-ctrl hover:bg-ink/90 transition-colors cursor-pointer"
+              >
+                <Upload size={13} strokeWidth={2} />
+                {uploading ? "Uploading" : "Upload"}
+              </label>
+            </>
+          }
+        />
 
         {/* Filters */}
-        <div className="flex gap-3 mb-4">
+        <div className="flex gap-2 mb-3">
           <div className="relative">
-            <Search
-              size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3"
-            />
+            <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-3" />
             <input
               type="text"
-              placeholder="Search by name…"
+              placeholder="Search by name"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="pl-8 pr-3 py-2 w-64 rounded-input border border-line bg-surface text-sm text-ink placeholder:text-ink-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+              className="h-8 pl-8 pr-3 w-56 rounded-ctrl border border-line bg-surface text-[13px] text-ink placeholder:text-ink-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
             />
           </div>
           <select
@@ -143,7 +148,7 @@ export default function DocumentsPage() {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="px-3 py-2 rounded-input border border-line bg-surface text-sm text-ink focus:outline-none focus:border-accent"
+            className="h-8 px-2 rounded-ctrl border border-line bg-surface text-[13px] text-ink focus:outline-none focus:border-accent"
           >
             <option value="">All statuses</option>
             <option value="PENDING">Pending</option>
@@ -153,26 +158,26 @@ export default function DocumentsPage() {
           </select>
         </div>
 
-        {/* Content */}
+        {/* Table */}
         {error ? (
           <Card>
             <ErrorState message={error} onRetry={load} />
           </Card>
         ) : loading ? (
           <Card>
-            <LoadingState label="Loading documents…" />
+            <LoadingState label="Loading documents" />
           </Card>
         ) : documents.length === 0 ? (
           <Card>
             <EmptyState
               title="No documents yet"
-              description="Upload a PDF, DOCX, or TXT file to start building your knowledge base."
+              description="Upload a PDF, DOCX, or TXT file to build your knowledge base."
               action={
                 <label
                   htmlFor="file-upload"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-btn hover:bg-accent-hover transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 h-8 px-3 bg-ink text-white text-[13px] font-medium rounded-ctrl hover:bg-ink/90 transition-colors cursor-pointer"
                 >
-                  <Upload size={14} strokeWidth={2} />
+                  <Upload size={13} strokeWidth={2} />
                   Upload your first document
                 </label>
               }
@@ -180,31 +185,34 @@ export default function DocumentsPage() {
           </Card>
         ) : (
           <Card className="overflow-hidden">
-            <table className="w-full text-sm">
+            <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-b border-line text-left">
-                  <th className="px-4 py-3 text-xs font-medium text-ink-2">Name</th>
-                  <th className="px-4 py-3 text-xs font-medium text-ink-2">Size</th>
-                  <th className="px-4 py-3 text-xs font-medium text-ink-2">Status</th>
-                  <th className="px-4 py-3 text-xs font-medium text-ink-2">Uploaded</th>
-                  <th className="px-4 py-3 text-xs font-medium text-ink-2 text-right">Actions</th>
+                <tr className="border-b border-line">
+                  <th className="text-left font-medium text-ink-2 text-[12px] px-4 h-9">Name</th>
+                  <th className="text-left font-medium text-ink-2 text-[12px] px-4 h-9 w-20">Size</th>
+                  <th className="text-left font-medium text-ink-2 text-[12px] px-4 h-9 w-28">Status</th>
+                  <th className="text-left font-medium text-ink-2 text-[12px] px-4 h-9 w-28">Uploaded</th>
+                  <th className="text-right font-medium text-ink-2 text-[12px] px-4 h-9 w-32">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {documents.map((doc) => (
-                  <tr key={doc.id} className="border-b border-line last:border-0">
-                    <td className="px-4 py-3 text-ink">{doc.name}</td>
-                    <td className="px-4 py-3 text-ink-2 tabular">{formatSize(doc.file_size)}</td>
-                    <td className="px-4 py-3">
+                  <tr
+                    key={doc.id}
+                    className="border-b border-line last:border-0 hover:bg-sunken/50 transition-colors"
+                  >
+                    <td className="px-4 h-10 text-ink">{doc.name}</td>
+                    <td className="px-4 h-10 text-ink-2 tabular">{formatSize(doc.file_size)}</td>
+                    <td className="px-4 h-10">
                       <Badge tone={STATUS_TONES[doc.processing_status] ?? "neutral"}>
                         {doc.processing_status}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-ink-2">
+                    <td className="px-4 h-10 text-ink-2">
                       {new Date(doc.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex gap-2 justify-end">
+                    <td className="px-4 h-10 text-right">
+                      <div className="flex gap-1 justify-end">
                         {doc.processing_status === "PENDING" && (
                           <Button variant="ghost" size="sm" onClick={() => handleProcess(doc.id)}>
                             Process
@@ -224,12 +232,17 @@ export default function DocumentsPage() {
 
         {/* Pagination */}
         {total > 20 && (
-          <div className="flex gap-2 mt-4 justify-center">
-            <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+          <div className="flex gap-2 mt-3 justify-center">
+            <Button variant="default" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
               Previous
             </Button>
-            <span className="px-3 py-1.5 text-xs text-ink-2">Page {page}</span>
-            <Button variant="secondary" size="sm" disabled={page * 20 >= total} onClick={() => setPage(page + 1)}>
+            <span className="px-3 py-1 text-[12px] text-ink-2">Page {page}</span>
+            <Button
+              variant="default"
+              size="sm"
+              disabled={page * 20 >= total}
+              onClick={() => setPage(page + 1)}
+            >
               Next
             </Button>
           </div>

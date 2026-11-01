@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { FileText, FolderClosed, MessagesSquare } from "lucide-react";
+import { FileText, FolderClosed, MessagesSquare, Users } from "lucide-react";
 import { api, type User } from "@/lib/api";
 import AppShell from "@/components/AppShell";
-import { Card, LoadingState } from "@/components/ui";
+import { Card, LoadingState, PageHeader } from "@/components/ui";
 
 interface Analytics {
   total_documents: number;
@@ -39,71 +39,70 @@ export default function DashboardPage() {
 
   return (
     <AppShell>
-      <div className="p-8 max-w-6xl">
-        {/* Header */}
-        <header className="mb-8">
-          <h1 className="text-2xl font-semibold text-ink tracking-tight">
-            {user ? `Welcome back, ${user.full_name.split(" ")[0]}` : "Dashboard"}
-          </h1>
-          <p className="text-sm text-ink-2 mt-1">
-            Overview of your knowledge base and AI activity.
-          </p>
-        </header>
+      <div className="p-6 max-w-5xl">
+        <PageHeader
+          title={user ? `Hello, ${user.full_name.split(" ")[0]}` : "Dashboard"}
+          description="Overview of your knowledge base."
+        />
 
-        {/* Stats */}
         {stats === null ? (
-          <LoadingState label="Loading statistics…" />
+          <Card>
+            <LoadingState label="Loading statistics" />
+          </Card>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             <StatCard
               label="Documents"
               value={stats.total_documents}
               detail={`${stats.completed_documents} processed`}
-              icon={<FileText size={16} strokeWidth={1.75} />}
+              icon={<FileText size={14} strokeWidth={1.75} />}
             />
             <StatCard
               label="Conversations"
               value={stats.total_conversations}
               detail={`${stats.total_messages} messages`}
-              icon={<MessagesSquare size={16} strokeWidth={1.75} />}
+              icon={<MessagesSquare size={14} strokeWidth={1.75} />}
             />
             <StatCard
-              label="Team members"
+              label="Members"
               value={stats.total_users}
-              icon={<FolderClosed size={16} strokeWidth={1.75} />}
+              icon={<Users size={14} strokeWidth={1.75} />}
             />
             <StatCard
               label="Pending"
               value={stats.pending_documents}
-              detail={stats.failed_documents > 0 ? `${stats.failed_documents} failed` : undefined}
-              icon={<FileText size={16} strokeWidth={1.75} />}
+              detail={
+                stats.failed_documents > 0
+                  ? `${stats.failed_documents} failed`
+                  : undefined
+              }
+              icon={<FolderClosed size={14} strokeWidth={1.75} />}
             />
           </div>
         )}
 
-        {/* Quick actions */}
-        <Card className="p-6">
-          <h2 className="text-sm font-medium text-ink mb-3">Get started</h2>
-          <div className="flex flex-wrap gap-3">
+        <Card className="p-5">
+          <h2 className="text-[13px] font-medium text-ink mb-3">Quick actions</h2>
+          <div className="flex flex-wrap gap-2">
             <a
               href="/documents"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-btn hover:bg-accent-hover transition-colors"
+              className="inline-flex items-center gap-1.5 h-8 px-3 bg-ink text-white text-[13px] font-medium rounded-ctrl hover:bg-ink/90 transition-colors"
             >
-              <FileText size={14} strokeWidth={2} />
+              <FileText size={13} strokeWidth={2} />
               Upload documents
             </a>
             <a
               href="/chat"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-surface text-ink border border-line text-sm font-medium rounded-btn hover:bg-sunken transition-colors"
+              className="inline-flex items-center gap-1.5 h-8 px-3 bg-surface text-ink border border-line text-[13px] font-medium rounded-ctrl hover:bg-sunken transition-colors"
             >
-              <MessagesSquare size={14} strokeWidth={2} />
-              Ask AI
+              <MessagesSquare size={13} strokeWidth={2} />
+              Ask a question
             </a>
             <a
               href="/tutorial"
-              className="inline-flex items-center gap-2 px-4 py-2 text-ink-2 text-sm font-medium rounded-btn hover:bg-sunken hover:text-ink transition-colors"
+              className="inline-flex items-center h-8 px-3 text-ink-2 text-[13px] font-medium rounded-ctrl hover:bg-sunken hover:text-ink transition-colors"
             >
-              Read tutorial
+              How it works
             </a>
           </div>
         </Card>
@@ -124,13 +123,13 @@ function StatCard({
   icon: React.ReactNode;
 }) {
   return (
-    <Card className="p-5">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-ink-2">{label}</span>
+    <Card className="p-4">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[12px] text-ink-2">{label}</span>
         <span className="text-ink-3">{icon}</span>
       </div>
-      <p className="text-2xl font-semibold text-ink tabular">{value}</p>
-      {detail && <p className="text-xs text-ink-3 mt-1">{detail}</p>}
+      <p className="text-xl font-semibold text-ink tabular leading-none">{value}</p>
+      {detail && <p className="text-[11px] text-ink-3 mt-1.5">{detail}</p>}
     </Card>
   );
 }

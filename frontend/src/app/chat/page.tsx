@@ -69,7 +69,6 @@ export default function ChatPage() {
     setInput("");
     setLoading(true);
 
-    // Optimistic user message
     setMessages((prev) => [
       ...prev,
       {
@@ -101,15 +100,15 @@ export default function ChatPage() {
   return (
     <AppShell>
       <div className="flex h-screen">
-        {/* Conversation sidebar */}
-        <div className="w-64 border-r border-line bg-surface flex flex-col">
-          <div className="p-4 border-b border-line">
-            <Button size="sm" onClick={handleNew} className="w-full">
-              <Plus size={14} strokeWidth={2} />
+        {/* Conversation list */}
+        <div className="w-56 border-r border-line bg-surface flex flex-col">
+          <div className="h-12 px-3 flex items-center border-b border-line">
+            <Button size="sm" variant="primary" onClick={handleNew} className="w-full">
+              <Plus size={13} strokeWidth={2} />
               New chat
             </Button>
           </div>
-          <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
+          <div className="flex-1 overflow-y-auto p-1.5 space-y-0.5">
             {conversations.map((conv) => (
               <button
                 key={conv.id}
@@ -117,9 +116,9 @@ export default function ChatPage() {
                   setActiveConv(conv.id);
                   setSources([]);
                 }}
-                className={`w-full text-left px-3 py-2 rounded-btn text-sm truncate transition-colors ${
+                className={`w-full text-left px-2.5 py-1.5 rounded-ctrl text-[13px] truncate transition-colors ${
                   activeConv === conv.id
-                    ? "bg-accent-soft text-accent"
+                    ? "bg-sunken text-ink font-medium"
                     : "text-ink-2 hover:bg-sunken hover:text-ink"
                 }`}
               >
@@ -130,19 +129,17 @@ export default function ChatPage() {
         </div>
 
         {/* Chat area */}
-        <div className="flex-1 flex flex-col">
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="flex-1 overflow-y-auto p-5 space-y-3">
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full">
-                <div className="text-center max-w-md">
-                  <h2 className="text-lg font-semibold text-ink mb-2">
+                <div className="text-center max-w-sm">
+                  <h2 className="text-[15px] font-semibold text-ink mb-1.5">
                     Ask your knowledge base
                   </h2>
-                  <p className="text-sm text-ink-2">
+                  <p className="text-[13px] text-ink-2 leading-relaxed">
                     Ask questions about your uploaded documents. CurioAI retrieves
-                    relevant passages and generates grounded answers with source
-                    citations.
+                    relevant passages and answers with source citations.
                   </p>
                 </div>
               </div>
@@ -153,15 +150,15 @@ export default function ChatPage() {
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[70%] px-4 py-3 rounded-card text-sm ${
+                    className={`max-w-[75%] px-3.5 py-2.5 rounded-card text-[13px] leading-relaxed ${
                       msg.role === "user"
-                        ? "bg-accent text-white"
+                        ? "bg-ink text-white"
                         : "bg-surface border border-line text-ink"
                     }`}
                   >
-                    <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
                     {msg.role === "assistant" && msg.latency_ms != null && (
-                      <p className="text-xs text-ink-3 mt-2 tabular">
+                      <p className="text-[11px] text-ink-3 mt-1.5 tabular">
                         {msg.model_name} · {msg.latency_ms}ms
                         {msg.input_tokens != null
                           ? ` · ${msg.input_tokens}+${msg.output_tokens} tokens`
@@ -173,14 +170,14 @@ export default function ChatPage() {
               ))
             )}
 
-            {/* Source citations */}
+            {/* Sources */}
             {sources.length > 0 && (
-              <div className="max-w-[70%] space-y-2">
-                <p className="text-xs font-medium text-ink-2">Sources</p>
+              <div className="max-w-[75%] space-y-1.5">
+                <p className="text-[11px] font-medium text-ink-2">Sources</p>
                 {sources.map((src, i) => (
                   <div
                     key={i}
-                    className="px-3 py-2 bg-surface border border-line rounded-btn text-xs text-ink-2"
+                    className="px-3 py-2 bg-surface border border-line rounded-ctrl text-[12px] text-ink-2"
                   >
                     <span className="font-medium text-ink">
                       {src.document_name || "Unknown"}
@@ -189,7 +186,7 @@ export default function ChatPage() {
                     {src.relevance_score != null &&
                       ` · ${(src.relevance_score * 100).toFixed(0)}% match`}
                     {src.excerpt && (
-                      <p className="mt-1 line-clamp-2 leading-relaxed">{src.excerpt}</p>
+                      <p className="mt-0.5 line-clamp-2 leading-relaxed">{src.excerpt}</p>
                     )}
                   </div>
                 ))}
@@ -198,7 +195,7 @@ export default function ChatPage() {
 
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-surface border border-line px-4 py-3 rounded-card">
+                <div className="bg-surface border border-line px-3.5 py-3 rounded-card">
                   <div className="flex gap-1">
                     <span className="w-1.5 h-1.5 bg-ink-3 rounded-full animate-bounce" />
                     <span className="w-1.5 h-1.5 bg-ink-3 rounded-full animate-bounce [animation-delay:0.1s]" />
@@ -212,18 +209,22 @@ export default function ChatPage() {
           </div>
 
           {/* Input */}
-          <div className="border-t border-line p-4 bg-surface">
-            <form onSubmit={handleSend} className="flex gap-3">
+          <div className="border-t border-line p-3 bg-surface">
+            <form onSubmit={handleSend} className="flex gap-2">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask a question about your documents…"
+                placeholder="Ask a question about your documents"
                 disabled={!activeConv || loading}
-                className="flex-1 px-4 py-2.5 rounded-input border border-line bg-canvas text-sm text-ink placeholder:text-ink-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:opacity-50"
+                className="flex-1 h-9 px-3 rounded-ctrl border border-line bg-canvas text-[13px] text-ink placeholder:text-ink-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent disabled:opacity-50"
               />
-              <Button type="submit" disabled={!input.trim() || !activeConv || loading}>
-                <Send size={14} strokeWidth={2} />
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={!input.trim() || !activeConv || loading}
+              >
+                <Send size={13} strokeWidth={2} />
                 Send
               </Button>
             </form>
