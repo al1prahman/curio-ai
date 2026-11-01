@@ -105,6 +105,29 @@ async def download_document(
     )
 
 
+@router.post("/{document_id}/process", response_model=DocumentResponse)
+async def process_document_endpoint(
+    document_id: uuid.UUID,
+    db: DbSession,
+    current_user: Annotated[User, Depends(require_permission("documents.view"))],
+) -> DocumentResponse:
+    from app.rag.pipeline import process_document
+
+    doc = await process_document(db, document_id, current_user.organization_id)
+    return DocumentResponse.model_validate(doc)
+
+
+@router.post("/process-all", response_model=dict)
+async def process_all_documents(
+    db: DbSession,
+    current_user: Annotated[User, Depends(require_permission("documents.view"))],
+) -> dict:
+    from app.rag.pipeline import process_pending_documents
+
+    count = await process_pending_documents(db, current_user.organization_id)
+    return {"processed": count}
+
+
 @router.delete("/{document_id}", response_model=DocumentResponse)
 async def delete_document_detail(
     document_id: uuid.UUID,
