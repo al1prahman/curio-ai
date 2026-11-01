@@ -1,26 +1,32 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, getToken, type Document } from "@/lib/api";
+import { Search, Upload } from "lucide-react";
+import { api, type Document } from "@/lib/api";
+import AppShell from "@/components/AppShell";
+import { Badge, Button, Card, EmptyState, ErrorState, LoadingState } from "@/components/ui";
+
+const STATUS_TONES: Record<string, "neutral" | "warn" | "accent" | "ok" | "bad"> = {
+  PENDING: "warn",
+  PROCESSING: "accent",
+  COMPLETED: "ok",
+  FAILED: "bad",
+};
 
 export default function DocumentsPage() {
-  const router = useRouter();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  const loadDocuments = useCallback(async () => {
-    if (!getToken()) {
-      router.push("/login");
-      return;
-    }
+  const load = useCallback(async () => {
     setLoading(true);
+    setError("");
     try {
       const params = new URLSearchParams({ page: String(page), page_size: "20" });
       if (search) params.set("search", search);
@@ -30,91 +36,72 @@ export default function DocumentsPage() {
       );
       setDocuments(data.items);
       setTotal(data.total);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load documents");
     } finally {
       setLoading(false);
     }
-  }, [page, search, statusFilter, router]);
+  }, [page, search, statusFilter]);
 
   useEffect(() => {
-    loadDocuments();
-  }, [loadDocuments]);
+    load();
+  }, [load]);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
+    if (!files?.length) return;
 
     setUploading(true);
     try {
       const formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        formData.append("files", files[i]);
+      for (let i = 0; i < files.length; i++) formData.append("files", files[i]);
+      const result = await api.upload<{ uploaded: Document[]; skipped: { filename: string; reason: string }[] }>(
+        "/documents/upload",
+        formData
+      );
+      if (result.skipped.length > 0) {
+        alert(`Skipped:\n${result.skipped.map((s) => `- ${s.filename}: ${s.reason}`).join("\n")}`);
       }
-      await api.upload("/documents/upload", formData);
-      await loadDocuments();
+      await load();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (fileRef.current) fileRef.current.value = "";
     }
   }
 
   async function handleProcess(id: string) {
     await api.post(`/documents/${id}/process`);
-    await loadDocuments();
+    await load();
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this document?")) return;
     await api.delete(`/documents/${id}`);
-    await loadDocuments();
+    await load();
   }
 
-  function formatSize(bytes: number): string {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  function formatSize(bytes: number) {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1048576).toFixed(1)} MB`;
   }
-
-  const statusColors: Record<string, string> = {
-    PENDING: "bg-warning/10 text-warning",
-    PROCESSING: "bg-primary/10 text-primary",
-    COMPLETED: "bg-success/10 text-success",
-    FAILED: "bg-danger/10 text-danger",
-  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <aside className="fixed left-0 top-0 h-full w-60 bg-surface border-r border-border p-4">
-        <h2 className="text-lg font-semibold text-text-primary mb-6">CurioAI</h2>
-        <nav className="space-y-1">
-          {[
-            { href: "/dashboard", label: "Dashboard", icon: "📊" },
-            { href: "/documents", label: "Documents", icon: "📄" },
-            { href: "/collections", label: "Collections", icon: "📁" },
-            { href: "/chat", label: "AI Chat", icon: "💬" },
-          ].map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-background hover:text-text-primary transition-colors"
-            >
-              <span>{item.icon}</span>
-              <span className="text-sm">{item.label}</span>
-            </a>
-          ))}
-        </nav>
-      </aside>
-
-      <main className="ml-60 p-8">
-        <header className="mb-6 flex items-center justify-between">
+    <AppShell>
+      <div className="p-8 max-w-6xl">
+        {/* Header */}
+        <header className="mb-6 flex items-end justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-text-primary">Documents</h1>
-            <p className="text-text-secondary mt-1">{total} documents</p>
+            <h1 className="text-2xl font-semibold text-ink tracking-tight">Documents</h1>
+            <p className="text-sm text-ink-2 mt-1">
+              {total} document{total !== 1 ? "s" : ""} in your knowledge base
+            </p>
           </div>
           <div>
             <input
-              ref={fileInputRef}
+              ref={fileRef}
               type="file"
               multiple
               accept=".pdf,.docx,.txt"
@@ -124,32 +111,39 @@ export default function DocumentsPage() {
             />
             <label
               htmlFor="file-upload"
-              className="px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary-hover transition-colors cursor-pointer inline-block"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-btn hover:bg-accent-hover transition-colors cursor-pointer"
             >
-              {uploading ? "Uploading..." : "Upload Documents"}
+              <Upload size={14} strokeWidth={2} />
+              {uploading ? "Uploading…" : "Upload"}
             </label>
           </div>
         </header>
 
         {/* Filters */}
         <div className="flex gap-3 mb-4">
-          <input
-            type="text"
-            placeholder="Search documents..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            className="px-3 py-2 rounded-lg border border-border bg-surface text-sm w-64"
-          />
+          <div className="relative">
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-3"
+            />
+            <input
+              type="text"
+              placeholder="Search by name…"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="pl-8 pr-3 py-2 w-64 rounded-input border border-line bg-surface text-sm text-ink placeholder:text-ink-3 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            />
+          </div>
           <select
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="px-3 py-2 rounded-lg border border-border bg-surface text-sm"
+            className="px-3 py-2 rounded-input border border-line bg-surface text-sm text-ink focus:outline-none focus:border-accent"
           >
             <option value="">All statuses</option>
             <option value="PENDING">Pending</option>
@@ -159,94 +153,88 @@ export default function DocumentsPage() {
           </select>
         </div>
 
-        {/* Table */}
-        <div className="bg-surface rounded-xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left">
-                <th className="px-4 py-3 font-medium text-text-secondary">Name</th>
-                <th className="px-4 py-3 font-medium text-text-secondary">Size</th>
-                <th className="px-4 py-3 font-medium text-text-secondary">Status</th>
-                <th className="px-4 py-3 font-medium text-text-secondary">Uploaded</th>
-                <th className="px-4 py-3 font-medium text-text-secondary">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-text-secondary">
-                    Loading...
-                  </td>
+        {/* Content */}
+        {error ? (
+          <Card>
+            <ErrorState message={error} onRetry={load} />
+          </Card>
+        ) : loading ? (
+          <Card>
+            <LoadingState label="Loading documents…" />
+          </Card>
+        ) : documents.length === 0 ? (
+          <Card>
+            <EmptyState
+              title="No documents yet"
+              description="Upload a PDF, DOCX, or TXT file to start building your knowledge base."
+              action={
+                <label
+                  htmlFor="file-upload"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-btn hover:bg-accent-hover transition-colors cursor-pointer"
+                >
+                  <Upload size={14} strokeWidth={2} />
+                  Upload your first document
+                </label>
+              }
+            />
+          </Card>
+        ) : (
+          <Card className="overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-line text-left">
+                  <th className="px-4 py-3 text-xs font-medium text-ink-2">Name</th>
+                  <th className="px-4 py-3 text-xs font-medium text-ink-2">Size</th>
+                  <th className="px-4 py-3 text-xs font-medium text-ink-2">Status</th>
+                  <th className="px-4 py-3 text-xs font-medium text-ink-2">Uploaded</th>
+                  <th className="px-4 py-3 text-xs font-medium text-ink-2 text-right">Actions</th>
                 </tr>
-              ) : documents.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-text-secondary">
-                    No documents found. Upload some to get started.
-                  </td>
-                </tr>
-              ) : (
-                documents.map((doc) => (
-                  <tr key={doc.id} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3 text-text-primary">{doc.name}</td>
-                    <td className="px-4 py-3 text-text-secondary">{formatSize(doc.file_size)}</td>
+              </thead>
+              <tbody>
+                {documents.map((doc) => (
+                  <tr key={doc.id} className="border-b border-line last:border-0">
+                    <td className="px-4 py-3 text-ink">{doc.name}</td>
+                    <td className="px-4 py-3 text-ink-2 tabular">{formatSize(doc.file_size)}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          statusColors[doc.processing_status] || "bg-background text-text-secondary"
-                        }`}
-                      >
+                      <Badge tone={STATUS_TONES[doc.processing_status] ?? "neutral"}>
                         {doc.processing_status}
-                      </span>
+                      </Badge>
                     </td>
-                    <td className="px-4 py-3 text-text-secondary">
+                    <td className="px-4 py-3 text-ink-2">
                       {new Date(doc.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2">
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex gap-2 justify-end">
                         {doc.processing_status === "PENDING" && (
-                          <button
-                            onClick={() => handleProcess(doc.id)}
-                            className="text-primary hover:underline text-xs"
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleProcess(doc.id)}>
                             Process
-                          </button>
+                          </Button>
                         )}
-                        <button
-                          onClick={() => handleDelete(doc.id)}
-                          className="text-danger hover:underline text-xs"
-                        >
+                        <Button variant="danger" size="sm" onClick={() => handleDelete(doc.id)}>
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        )}
 
         {/* Pagination */}
         {total > 20 && (
           <div className="flex gap-2 mt-4 justify-center">
-            <button
-              disabled={page <= 1}
-              onClick={() => setPage(page - 1)}
-              className="px-3 py-1 text-sm border border-border rounded-lg disabled:opacity-50"
-            >
+            <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
               Previous
-            </button>
-            <span className="px-3 py-1 text-sm text-text-secondary">Page {page}</span>
-            <button
-              disabled={page * 20 >= total}
-              onClick={() => setPage(page + 1)}
-              className="px-3 py-1 text-sm border border-border rounded-lg disabled:opacity-50"
-            >
+            </Button>
+            <span className="px-3 py-1.5 text-xs text-ink-2">Page {page}</span>
+            <Button variant="secondary" size="sm" disabled={page * 20 >= total} onClick={() => setPage(page + 1)}>
               Next
-            </button>
+            </Button>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
