@@ -17,8 +17,16 @@ router = APIRouter(prefix="/analytics", tags=["Analytics"])
 async def get_overview(
     db: DbSession,
     current_user: Annotated[User, Depends(require_permission("analytics.view"))],
-) -> dict[str, Any]:
+) -> dict:
     """Dashboard statistics for the current organization."""
+    from app.services.redis_service import cache_get, cache_set
+
+    # Try cache first
+    cache_key = f"analytics:overview:{current_user.organization_id}"
+    cached = await cache_get(cache_key)
+    if cached is not None:
+        return cached
+
     org_id = current_user.organization_id
 
     doc_result = await db.execute(
@@ -48,7 +56,7 @@ async def get_overview(
 
     total_documents = sum(doc_counts.values())
 
-    return {
+    result = {
         "total_documents": total_documents,
         "completed_documents": doc_counts.get("COMPLETED", 0),
         "pending_documents": doc_counts.get("PENDING", 0),
@@ -58,6 +66,10 @@ async def get_overview(
         "total_conversations": total_conversations,
         "total_messages": total_messages,
     }
+
+    # Cache for 60 seconds
+    await cache_set(cache_key, result, ttl_seconds=60)
+    return result
 
 
 @router.get("/usage")

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.rate_limit import RateLimitMiddleware
 
 app = FastAPI(
     title="CurioAI API",
@@ -20,9 +21,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(RateLimitMiddleware)
+
 app.include_router(api_router, prefix="/api/v1")
 
 
 @app.get("/health")
 async def health_check() -> dict[str, str]:
     return {"status": "ok", "env": settings.APP_ENV}
+
+
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    from app.services.redis_service import RedisService
+
+    await RedisService.close()
