@@ -1,0 +1,2201 @@
+{
+  "project": {
+    "name": "NexusAI",
+    "full_name": "NexusAI - Enterprise Knowledge & AI Intelligence Platform",
+    "version": "1.0.0",
+    "status": "planned",
+    "type": "Web Application",
+    "category": [
+      "Artificial Intelligence",
+      "Enterprise Software",
+      "Knowledge Management",
+      "Retrieval Augmented Generation"
+    ],
+    "description": "A multi-user enterprise knowledge management platform that allows organizations to upload, organize, search, and retrieve internal documents using AI-powered Retrieval Augmented Generation (RAG).",
+    "vision": "To provide organizations with a centralized, secure, and intelligent knowledge platform that transforms unstructured documents into accessible and actionable information.",
+    "primary_language": "English",
+    "development_language": "TypeScript and Python",
+    "target_platform": [
+      "Desktop Web",
+      "Tablet Web",
+      "Mobile Responsive Web"
+    ]
+  },
+
+  "product_objectives": {
+    "primary": [
+      {
+        "id": "OBJ-001",
+        "objective": "Centralize organizational knowledge",
+        "description": "Provide a single platform for storing and managing internal organizational documents."
+      },
+      {
+        "id": "OBJ-002",
+        "objective": "Enable AI-powered knowledge retrieval",
+        "description": "Allow users to ask natural language questions and retrieve relevant information from uploaded documents."
+      },
+      {
+        "id": "OBJ-003",
+        "objective": "Improve information accessibility",
+        "description": "Reduce the time required to find information in large collections of documents."
+      },
+      {
+        "id": "OBJ-004",
+        "objective": "Ensure secure knowledge access",
+        "description": "Implement authentication, role-based access control, and document-level permissions."
+      },
+      {
+        "id": "OBJ-005",
+        "objective": "Provide operational insights",
+        "description": "Provide analytics about document usage, AI interactions, user activity, and system performance."
+      }
+    ],
+    "success_metrics": [
+      {
+        "metric": "Document upload success rate",
+        "target": "At least 95%",
+        "measurement": "Successful document processing divided by total valid upload attempts."
+      },
+      {
+        "metric": "AI response success rate",
+        "target": "At least 95%",
+        "measurement": "Successfully completed AI responses divided by total valid questions."
+      },
+      {
+        "metric": "Source citation availability",
+        "target": "At least 95%",
+        "measurement": "Responses containing valid document references divided by responses requiring citations."
+      },
+      {
+        "metric": "Unauthorized document access",
+        "target": "0 successful unauthorized accesses",
+        "measurement": "Automated authorization and access-control tests."
+      },
+      {
+        "metric": "Application availability",
+        "target": "99% during the initial production evaluation",
+        "measurement": "Application uptime monitoring."
+      }
+    ]
+  },
+
+  "problem_statement": {
+    "problems": [
+      {
+        "id": "PROB-001",
+        "title": "Scattered organizational documents",
+        "description": "Organizational information is distributed across multiple files and storage locations, making it difficult to manage."
+      },
+      {
+        "id": "PROB-002",
+        "title": "Time-consuming information retrieval",
+        "description": "Employees must manually search through lengthy documents to find specific information."
+      },
+      {
+        "id": "PROB-003",
+        "title": "Limited contextual search",
+        "description": "Traditional keyword search cannot always understand the context or intent behind a user's question."
+      },
+      {
+        "id": "PROB-004",
+        "title": "Uncontrolled information access",
+        "description": "Organizations need a way to ensure users can only retrieve information they are authorized to access."
+      },
+      {
+        "id": "PROB-005",
+        "title": "Lack of usage visibility",
+        "description": "Administrators need insights into document usage, user activity, and AI system performance."
+      }
+    ],
+    "proposed_solution": "NexusAI combines document management, semantic search, Retrieval Augmented Generation, role-based authorization, and analytics into one integrated platform."
+  },
+
+  "target_users": {
+    "personas": [
+      {
+        "id": "PERSONA-001",
+        "name": "System Administrator",
+        "role": "ADMIN",
+        "description": "Responsible for managing the organization, users, roles, permissions, and system configuration.",
+        "goals": [
+          "Manage organization members",
+          "Assign user roles",
+          "Manage document access permissions",
+          "Monitor system activity",
+          "Review system analytics"
+        ]
+      },
+      {
+        "id": "PERSONA-002",
+        "name": "Knowledge Manager",
+        "role": "MANAGER",
+        "description": "Responsible for managing organizational knowledge and maintaining document collections.",
+        "goals": [
+          "Upload organizational documents",
+          "Organize document collections",
+          "Monitor document processing",
+          "Manage document availability",
+          "Review knowledge usage"
+        ]
+      },
+      {
+        "id": "PERSONA-003",
+        "name": "Employee",
+        "role": "EMPLOYEE",
+        "description": "An organization member who uses AI to search and retrieve information from authorized documents.",
+        "goals": [
+          "Ask questions using natural language",
+          "Receive contextual answers",
+          "View source citations",
+          "Access conversation history",
+          "Search authorized knowledge"
+        ]
+      }
+    ]
+  },
+
+  "roles_and_permissions": {
+    "roles": [
+      {
+        "name": "ADMIN",
+        "description": "Full organization-level access.",
+        "permissions": [
+          "dashboard.view",
+          "users.view",
+          "users.create",
+          "users.update",
+          "users.delete",
+          "roles.manage",
+          "documents.view",
+          "documents.upload",
+          "documents.update",
+          "documents.delete",
+          "documents.manage_permissions",
+          "collections.view",
+          "collections.manage",
+          "chat.use",
+          "chat.view_own",
+          "analytics.view",
+          "settings.manage",
+          "audit_logs.view"
+        ]
+      },
+      {
+        "name": "MANAGER",
+        "description": "Manages knowledge resources and authorized document collections.",
+        "permissions": [
+          "dashboard.view",
+          "documents.view",
+          "documents.upload",
+          "documents.update",
+          "documents.delete",
+          "documents.manage_permissions",
+          "collections.view",
+          "collections.manage",
+          "chat.use",
+          "chat.view_own",
+          "analytics.view"
+        ]
+      },
+      {
+        "name": "EMPLOYEE",
+        "description": "Uses authorized knowledge resources and AI chat functionality.",
+        "permissions": [
+          "dashboard.view",
+          "documents.view_authorized",
+          "collections.view_authorized",
+          "chat.use",
+          "chat.view_own"
+        ]
+      }
+    ],
+    "authorization_rules": [
+      "Every authenticated user must belong to an organization.",
+      "Every organization must have isolated data access.",
+      "Users must not access resources belonging to another organization.",
+      "Employees can only retrieve documents they are authorized to access.",
+      "Document permissions must be validated before retrieving vector search results.",
+      "Users can only view their own conversations unless an explicitly authorized administrative feature is implemented.",
+      "Administrators can manage users and organization-level configurations.",
+      "Every protected backend endpoint must validate authentication and authorization."
+    ]
+  },
+
+  "technology_stack": {
+    "frontend": {
+      "framework": "Next.js",
+      "version_policy": "Use a stable release compatible with the selected dependencies.",
+      "language": "TypeScript",
+      "ui_library": "React",
+      "styling": "Tailwind CSS",
+      "components": "Reusable custom components",
+      "icons": "Lucide React",
+      "charts": "Recharts",
+      "form_management": "React Hook Form",
+      "validation": "Zod",
+      "server_state": "TanStack Query",
+      "client_state": "Zustand",
+      "requirements": [
+        "Responsive design",
+        "Reusable components",
+        "Accessible interfaces",
+        "Consistent design system",
+        "Loading and error states",
+        "Form validation",
+        "Role-aware navigation"
+      ]
+    },
+    "backend": {
+      "framework": "FastAPI",
+      "language": "Python",
+      "api_style": "REST API",
+      "orm": "SQLAlchemy",
+      "migration": "Alembic",
+      "validation": "Pydantic",
+      "authentication": "JWT",
+      "password_hashing": "Argon2 or bcrypt",
+      "background_processing": "Background worker",
+      "requirements": [
+        "Modular architecture",
+        "Input validation",
+        "Centralized exception handling",
+        "Structured logging",
+        "API documentation",
+        "Authorization middleware",
+        "Asynchronous request handling where appropriate"
+      ]
+    },
+    "database": {
+      "primary": "PostgreSQL",
+      "vector_database": "Qdrant",
+      "cache": "Redis",
+      "object_storage": "S3-compatible storage",
+      "requirements": [
+        "Relational data integrity",
+        "Database migrations",
+        "Organization data isolation",
+        "Indexed query optimization",
+        "Vector metadata filtering",
+        "Backup strategy"
+      ]
+    },
+    "artificial_intelligence": {
+      "architecture": "Retrieval Augmented Generation",
+      "llm_provider": "Provider-agnostic API integration",
+      "embedding_provider": "Configurable embedding model",
+      "vector_search": "Qdrant similarity search",
+      "document_processing": [
+        "Text extraction",
+        "Text normalization",
+        "Document chunking",
+        "Embedding generation",
+        "Vector storage"
+      ],
+      "generation": [
+        "Context retrieval",
+        "Prompt construction",
+        "LLM generation",
+        "Source citation mapping",
+        "Response validation"
+      ],
+      "advanced_orchestration": "LangGraph",
+      "requirements": [
+        "Configurable LLM provider",
+        "Configurable embedding model",
+        "Grounded responses",
+        "Source citations",
+        "Retrieval permission filtering",
+        "Token usage tracking",
+        "AI request error handling"
+      ]
+    },
+    "infrastructure": {
+      "containerization": "Docker",
+      "orchestration": "Docker Compose for initial deployment",
+      "version_control": "Git",
+      "repository_hosting": "GitHub",
+      "testing": [
+        "Pytest",
+        "Playwright"
+      ],
+      "monitoring": [
+        "Application logs",
+        "API latency",
+        "Error rates",
+        "AI token usage",
+        "Document processing status"
+      ]
+    }
+  },
+
+  "system_architecture": {
+    "architecture_style": "Modular monolith with separated frontend, backend, and worker services.",
+    "components": [
+      {
+        "name": "Frontend Application",
+        "technology": "Next.js",
+        "responsibilities": [
+          "User interface",
+          "Authentication screens",
+          "Dashboard",
+          "Document management",
+          "AI chat interface",
+          "Analytics visualization"
+        ]
+      },
+      {
+        "name": "Backend API",
+        "technology": "FastAPI",
+        "responsibilities": [
+          "Authentication",
+          "Authorization",
+          "Business logic",
+          "Document management",
+          "Chat orchestration",
+          "Analytics endpoints"
+        ]
+      },
+      {
+        "name": "PostgreSQL",
+        "technology": "PostgreSQL",
+        "responsibilities": [
+          "Users",
+          "Organizations",
+          "Roles",
+          "Documents metadata",
+          "Collections",
+          "Conversations",
+          "Messages",
+          "Audit logs"
+        ]
+      },
+      {
+        "name": "Document Worker",
+        "technology": "Python worker",
+        "responsibilities": [
+          "Document extraction",
+          "Text chunking",
+          "Embedding generation",
+          "Vector indexing",
+          "Processing status updates"
+        ]
+      },
+      {
+        "name": "Qdrant",
+        "technology": "Qdrant",
+        "responsibilities": [
+          "Vector storage",
+          "Semantic similarity search",
+          "Metadata filtering",
+          "Document chunk retrieval"
+        ]
+      },
+      {
+        "name": "Redis",
+        "technology": "Redis",
+        "responsibilities": [
+          "Caching",
+          "Temporary session data",
+          "Background job coordination when configured",
+          "Rate limiting support"
+        ]
+      },
+      {
+        "name": "LLM Service",
+        "technology": "External LLM API",
+        "responsibilities": [
+          "Natural language generation",
+          "Contextual question answering",
+          "Response generation"
+        ]
+      },
+      {
+        "name": "Object Storage",
+        "technology": "S3-compatible storage",
+        "responsibilities": [
+          "Original document storage",
+          "Document file retrieval",
+          "Document lifecycle management"
+        ]
+      }
+    ],
+    "request_flow": {
+      "document_upload": [
+        "User uploads a document through Next.js.",
+        "Frontend sends the document to the FastAPI backend.",
+        "Backend validates the file, user permissions, and organization.",
+        "Original file is stored in object storage.",
+        "Document metadata and processing status are saved in PostgreSQL.",
+        "A background processing job is created.",
+        "Worker extracts and normalizes document text.",
+        "Worker divides text into chunks.",
+        "Embedding vectors are generated.",
+        "Vectors and metadata are stored in Qdrant.",
+        "Document processing status is updated."
+      ],
+      "ai_question": [
+        "User submits a question through the chat interface.",
+        "Backend validates JWT and organization membership.",
+        "Backend checks access permissions for the requested knowledge scope.",
+        "Question embedding is generated.",
+        "Qdrant retrieves relevant authorized document chunks.",
+        "Backend prepares the context and source references.",
+        "Context and question are sent to the configured LLM.",
+        "LLM generates a grounded response.",
+        "Backend validates and stores the answer and source references.",
+        "Frontend displays the response and citations."
+      ]
+    }
+  },
+
+  "functional_requirements": {
+    "authentication": [
+      {
+        "id": "AUTH-001",
+        "name": "User Login",
+        "priority": "MUST",
+        "description": "Users can log in using email and password.",
+        "acceptance_criteria": [
+          "Valid credentials allow access.",
+          "Invalid credentials return a clear error.",
+          "Passwords are never stored in plaintext.",
+          "Successful login issues a secure authentication token."
+        ]
+      },
+      {
+        "id": "AUTH-002",
+        "name": "User Logout",
+        "priority": "MUST",
+        "description": "Users can terminate their authenticated session.",
+        "acceptance_criteria": [
+          "User can log out from the application.",
+          "Protected pages are inaccessible after logout.",
+          "Authentication state is cleared securely."
+        ]
+      },
+      {
+        "id": "AUTH-003",
+        "name": "User Management",
+        "priority": "MUST",
+        "description": "Administrators can create, update, deactivate, and manage organization users.",
+        "acceptance_criteria": [
+          "Only administrators can manage organization members.",
+          "Each user has an assigned role.",
+          "User email must be unique within the system.",
+          "Deactivated users cannot access protected services."
+        ]
+      },
+      {
+        "id": "AUTH-004",
+        "name": "Role-Based Access Control",
+        "priority": "MUST",
+        "description": "System permissions are enforced based on user roles and resource permissions.",
+        "acceptance_criteria": [
+          "Unauthorized actions return HTTP 403.",
+          "Unauthenticated requests return HTTP 401.",
+          "Frontend navigation reflects user permissions.",
+          "Backend independently validates all protected actions."
+        ]
+      }
+    ],
+
+    "dashboard": [
+      {
+        "id": "DASH-001",
+        "name": "Overview Dashboard",
+        "priority": "MUST",
+        "description": "Display relevant organization and knowledge statistics.",
+        "widgets": [
+          "Total documents",
+          "Successfully processed documents",
+          "Pending documents",
+          "Total users",
+          "Total AI questions",
+          "Recent activities",
+          "AI usage overview"
+        ],
+        "acceptance_criteria": [
+          "Dashboard displays data from authorized organization scope.",
+          "Statistics are calculated from backend data.",
+          "Loading, empty, and error states are supported."
+        ]
+      }
+    ],
+
+    "document_management": [
+      {
+        "id": "DOC-001",
+        "name": "Upload Documents",
+        "priority": "MUST",
+        "description": "Users with permission can upload organizational documents.",
+        "supported_formats": [
+          "PDF",
+          "DOCX",
+          "TXT"
+        ],
+        "initial_constraints": {
+          "max_file_size_mb": 20,
+          "max_files_per_request": 10,
+          "duplicate_handling": "Prevent duplicate files within the same organization using file checksum."
+        },
+        "acceptance_criteria": [
+          "Supported file types are accepted.",
+          "Unsupported file types are rejected.",
+          "Maximum file size is enforced.",
+          "Upload progress is displayed.",
+          "Uploaded documents receive a processing status.",
+          "Invalid uploads return meaningful errors."
+        ]
+      },
+      {
+        "id": "DOC-002",
+        "name": "Document Listing",
+        "priority": "MUST",
+        "description": "Display documents available to the authenticated user.",
+        "features": [
+          "Pagination",
+          "Search by document name",
+          "Filter by processing status",
+          "Filter by collection",
+          "Sort by upload date",
+          "Document metadata"
+        ],
+        "acceptance_criteria": [
+          "Users only see documents they are authorized to access.",
+          "Search and filtering work together.",
+          "Pagination returns consistent results."
+        ]
+      },
+      {
+        "id": "DOC-003",
+        "name": "Document Details",
+        "priority": "MUST",
+        "description": "Display detailed information about a selected document.",
+        "fields": [
+          "Document name",
+          "File type",
+          "File size",
+          "Upload date",
+          "Uploader",
+          "Processing status",
+          "Collection",
+          "Access permissions",
+          "Processing error when applicable"
+        ]
+      },
+      {
+        "id": "DOC-004",
+        "name": "Delete Documents",
+        "priority": "MUST",
+        "description": "Authorized users can delete documents and their indexed content.",
+        "acceptance_criteria": [
+          "Deletion requires confirmation.",
+          "Document metadata is removed or soft-deleted according to retention policy.",
+          "Associated vector chunks are deleted or made inaccessible.",
+          "Original files are removed according to the configured storage lifecycle.",
+          "Deletion is recorded in audit logs."
+        ]
+      },
+      {
+        "id": "DOC-005",
+        "name": "Document Processing Status",
+        "priority": "MUST",
+        "description": "Track document ingestion and indexing progress.",
+        "statuses": [
+          "PENDING",
+          "PROCESSING",
+          "COMPLETED",
+          "FAILED"
+        ],
+        "acceptance_criteria": [
+          "Status updates are persisted.",
+          "Failed documents display an error reason.",
+          "Failed processing can be retried by authorized users."
+        ]
+      }
+    ],
+
+    "collections": [
+      {
+        "id": "COL-001",
+        "name": "Collection Management",
+        "priority": "MUST",
+        "description": "Organize documents into logical knowledge collections.",
+        "features": [
+          "Create collection",
+          "Edit collection",
+          "Delete collection",
+          "Assign documents",
+          "Search collections",
+          "Manage collection permissions"
+        ],
+        "acceptance_criteria": [
+          "Collections belong to an organization.",
+          "Documents can be associated with collections.",
+          "Users only see authorized collections.",
+          "Deleting a collection does not silently delete its documents."
+        ]
+      }
+    ],
+
+    "ai_chat": [
+      {
+        "id": "CHAT-001",
+        "name": "AI Knowledge Assistant",
+        "priority": "MUST",
+        "description": "Users can ask natural language questions about authorized organizational documents.",
+        "features": [
+          "Natural language input",
+          "Streaming response when supported",
+          "Conversation history",
+          "Source citations",
+          "Follow-up questions",
+          "Error handling",
+          "Token usage tracking"
+        ],
+        "acceptance_criteria": [
+          "Questions are processed using authorized knowledge only.",
+          "Responses are grounded in retrieved context.",
+          "Relevant sources are displayed.",
+          "Users receive an appropriate response when no relevant information is found.",
+          "AI provider failures are handled gracefully.",
+          "Each conversation belongs to its creator and organization."
+        ]
+      },
+      {
+        "id": "CHAT-002",
+        "name": "Source Citations",
+        "priority": "MUST",
+        "description": "Display document references used to generate AI responses.",
+        "citation_fields": [
+          "Document ID",
+          "Document name",
+          "Page number when available",
+          "Chunk reference",
+          "Relevant text excerpt"
+        ],
+        "acceptance_criteria": [
+          "Every displayed citation references an existing authorized document.",
+          "Page numbers are displayed only when available.",
+          "Users cannot open documents they are not authorized to access."
+        ]
+      },
+      {
+        "id": "CHAT-003",
+        "name": "Conversation History",
+        "priority": "MUST",
+        "description": "Allow users to view and manage their previous conversations.",
+        "features": [
+          "Create conversation",
+          "List conversations",
+          "Rename conversation",
+          "Delete conversation",
+          "View messages",
+          "Continue conversation"
+        ]
+      },
+      {
+        "id": "CHAT-004",
+        "name": "Contextual Conversation Memory",
+        "priority": "SHOULD",
+        "description": "Maintain relevant conversation context for follow-up questions.",
+        "acceptance_criteria": [
+          "Recent conversation context is included within configured limits.",
+          "Context is isolated by user and conversation.",
+          "Memory does not bypass document permissions."
+        ]
+      },
+      {
+        "id": "CHAT-005",
+        "name": "Feedback",
+        "priority": "SHOULD",
+        "description": "Allow users to rate AI responses.",
+        "feedback_options": [
+          "THUMBS_UP",
+          "THUMBS_DOWN"
+        ],
+        "acceptance_criteria": [
+          "Feedback is associated with a specific AI message.",
+          "Feedback can be reviewed by authorized administrators."
+        ]
+      }
+    ],
+
+    "analytics": [
+      {
+        "id": "ANALYTICS-001",
+        "name": "Usage Analytics",
+        "priority": "SHOULD",
+        "metrics": [
+          "Total questions",
+          "Daily questions",
+          "Active users",
+          "Total documents",
+          "Document processing success rate",
+          "Average response time",
+          "LLM token consumption",
+          "Estimated AI usage cost"
+        ],
+        "acceptance_criteria": [
+          "Analytics respect organization boundaries.",
+          "Time range filters are available.",
+          "Charts display backend-derived data."
+        ]
+      },
+      {
+        "id": "ANALYTICS-002",
+        "name": "Activity Monitoring",
+        "priority": "SHOULD",
+        "description": "Display important user and system activities.",
+        "activities": [
+          "User login",
+          "Document upload",
+          "Document deletion",
+          "Collection creation",
+          "Permission changes",
+          "AI chat usage"
+        ]
+      }
+    ],
+
+    "administration": [
+      {
+        "id": "ADMIN-001",
+        "name": "Organization Settings",
+        "priority": "SHOULD",
+        "features": [
+          "Organization name",
+          "Organization profile",
+          "Default AI model configuration",
+          "Usage limits",
+          "Security settings"
+        ]
+      },
+      {
+        "id": "ADMIN-002",
+        "name": "Audit Logs",
+        "priority": "SHOULD",
+        "description": "Record security-sensitive and administrative activities.",
+        "fields": [
+          "Actor ID",
+          "Organization ID",
+          "Action",
+          "Resource type",
+          "Resource ID",
+          "Timestamp",
+          "IP address when available",
+          "Metadata"
+        ]
+      }
+    ]
+  },
+
+  "rag_pipeline": {
+    "pipeline_name": "NexusAI Retrieval Augmented Generation Pipeline",
+    "stages": [
+      {
+        "step": 1,
+        "name": "Document Ingestion",
+        "description": "Receive and validate uploaded documents.",
+        "operations": [
+          "Validate MIME type",
+          "Validate file size",
+          "Calculate checksum",
+          "Store original file",
+          "Create document metadata"
+        ]
+      },
+      {
+        "step": 2,
+        "name": "Text Extraction",
+        "description": "Extract textual content from supported file formats.",
+        "operations": [
+          "Extract PDF text",
+          "Extract DOCX text",
+          "Read TXT content",
+          "Preserve page information when available",
+          "Normalize extracted text"
+        ]
+      },
+      {
+        "step": 3,
+        "name": "Text Chunking",
+        "description": "Divide extracted text into smaller semantic units.",
+        "configuration": {
+          "chunk_size": 1000,
+          "chunk_overlap": 150,
+          "unit": "tokens",
+          "strategy": "Recursive character or token-aware chunking",
+          "configurable": true
+        },
+        "operations": [
+          "Split text into chunks",
+          "Preserve document references",
+          "Preserve page metadata when available",
+          "Generate stable chunk identifiers"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "Embedding Generation",
+        "description": "Convert document chunks into vector embeddings.",
+        "operations": [
+          "Call configured embedding provider",
+          "Validate embedding dimensions",
+          "Handle provider errors",
+          "Associate embeddings with chunk metadata"
+        ]
+      },
+      {
+        "step": 5,
+        "name": "Vector Indexing",
+        "description": "Store vectors and metadata in Qdrant.",
+        "metadata": [
+          "organization_id",
+          "document_id",
+          "collection_id",
+          "chunk_id",
+          "page_number",
+          "access_scope"
+        ]
+      },
+      {
+        "step": 6,
+        "name": "Query Processing",
+        "description": "Prepare a user question for semantic retrieval.",
+        "operations": [
+          "Validate user identity",
+          "Validate organization membership",
+          "Validate knowledge scope",
+          "Generate query embedding"
+        ]
+      },
+      {
+        "step": 7,
+        "name": "Retrieval",
+        "description": "Retrieve relevant authorized chunks from Qdrant.",
+        "configuration": {
+          "top_k": 5,
+          "similarity_threshold": 0.7,
+          "configurable": true
+        },
+        "operations": [
+          "Apply organization filter",
+          "Apply collection filter",
+          "Apply document permission filter",
+          "Perform similarity search",
+          "Rank retrieved chunks"
+        ]
+      },
+      {
+        "step": 8,
+        "name": "Context Construction",
+        "description": "Prepare retrieved information for LLM generation.",
+        "operations": [
+          "Remove irrelevant chunks",
+          "Deduplicate overlapping content",
+          "Respect context token limits",
+          "Attach citation metadata"
+        ]
+      },
+      {
+        "step": 9,
+        "name": "LLM Generation",
+        "description": "Generate an answer based on retrieved context.",
+        "rules": [
+          "Use retrieved documents as the primary knowledge source.",
+          "Do not fabricate document citations.",
+          "Clearly indicate when available information is insufficient.",
+          "Avoid exposing unauthorized document content.",
+          "Provide concise and relevant answers."
+        ]
+      },
+      {
+        "step": 10,
+        "name": "Response Persistence",
+        "description": "Store generated responses and their citations.",
+        "operations": [
+          "Save user message",
+          "Save assistant message",
+          "Save source references",
+          "Save token usage",
+          "Save latency information"
+        ]
+      }
+    ],
+    "security_requirements": [
+      "Apply access filters before returning vector search results.",
+      "Never trust frontend-supplied organization identifiers.",
+      "Validate document access using backend authorization rules.",
+      "Prevent cross-organization retrieval.",
+      "Revalidate permissions when displaying source documents.",
+      "Keep LLM API keys on the backend."
+    ]
+  },
+
+  "database_design": {
+    "database": "PostgreSQL",
+    "entities": [
+      {
+        "table": "organizations",
+        "description": "Stores organization information.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "name VARCHAR(255) NOT NULL",
+          "slug VARCHAR(255) UNIQUE NOT NULL",
+          "description TEXT NULL",
+          "created_at TIMESTAMP",
+          "updated_at TIMESTAMP"
+        ]
+      },
+      {
+        "table": "users",
+        "description": "Stores user account information.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "organization_id UUID REFERENCES organizations(id)",
+          "full_name VARCHAR(255) NOT NULL",
+          "email VARCHAR(255) UNIQUE NOT NULL",
+          "password_hash TEXT NOT NULL",
+          "role VARCHAR(30) NOT NULL",
+          "status VARCHAR(30) NOT NULL",
+          "last_login_at TIMESTAMP NULL",
+          "created_at TIMESTAMP",
+          "updated_at TIMESTAMP"
+        ]
+      },
+      {
+        "table": "collections",
+        "description": "Stores document collections.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "organization_id UUID REFERENCES organizations(id)",
+          "name VARCHAR(255) NOT NULL",
+          "description TEXT NULL",
+          "created_by UUID REFERENCES users(id)",
+          "created_at TIMESTAMP",
+          "updated_at TIMESTAMP"
+        ]
+      },
+      {
+        "table": "documents",
+        "description": "Stores document metadata.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "organization_id UUID REFERENCES organizations(id)",
+          "collection_id UUID REFERENCES collections(id) NULL",
+          "uploaded_by UUID REFERENCES users(id)",
+          "name VARCHAR(255) NOT NULL",
+          "original_filename VARCHAR(255) NOT NULL",
+          "storage_key TEXT NOT NULL",
+          "mime_type VARCHAR(100) NOT NULL",
+          "file_size BIGINT NOT NULL",
+          "checksum VARCHAR(128) NOT NULL",
+          "processing_status VARCHAR(30) NOT NULL",
+          "processing_error TEXT NULL",
+          "page_count INTEGER NULL",
+          "created_at TIMESTAMP",
+          "updated_at TIMESTAMP",
+          "deleted_at TIMESTAMP NULL"
+        ]
+      },
+      {
+        "table": "document_permissions",
+        "description": "Stores document access permissions.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "document_id UUID REFERENCES documents(id)",
+          "user_id UUID REFERENCES users(id) NULL",
+          "role VARCHAR(30) NULL",
+          "permission VARCHAR(30) NOT NULL",
+          "created_at TIMESTAMP"
+        ]
+      },
+      {
+        "table": "document_chunks",
+        "description": "Stores extracted document chunk metadata.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "document_id UUID REFERENCES documents(id)",
+          "organization_id UUID REFERENCES organizations(id)",
+          "chunk_index INTEGER NOT NULL",
+          "content TEXT NOT NULL",
+          "page_number INTEGER NULL",
+          "vector_id VARCHAR(255) NOT NULL",
+          "token_count INTEGER NULL",
+          "created_at TIMESTAMP"
+        ]
+      },
+      {
+        "table": "conversations",
+        "description": "Stores AI chat conversations.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "organization_id UUID REFERENCES organizations(id)",
+          "user_id UUID REFERENCES users(id)",
+          "title VARCHAR(255) NOT NULL",
+          "created_at TIMESTAMP",
+          "updated_at TIMESTAMP"
+        ]
+      },
+      {
+        "table": "messages",
+        "description": "Stores conversation messages.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "conversation_id UUID REFERENCES conversations(id)",
+          "role VARCHAR(30) NOT NULL",
+          "content TEXT NOT NULL",
+          "model_name VARCHAR(255) NULL",
+          "input_tokens INTEGER NULL",
+          "output_tokens INTEGER NULL",
+          "latency_ms INTEGER NULL",
+          "created_at TIMESTAMP"
+        ]
+      },
+      {
+        "table": "message_sources",
+        "description": "Stores source citations for assistant messages.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "message_id UUID REFERENCES messages(id)",
+          "document_id UUID REFERENCES documents(id)",
+          "chunk_id UUID REFERENCES document_chunks(id)",
+          "page_number INTEGER NULL",
+          "excerpt TEXT NULL",
+          "relevance_score FLOAT NULL"
+        ]
+      },
+      {
+        "table": "message_feedback",
+        "description": "Stores user feedback for AI responses.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "message_id UUID REFERENCES messages(id)",
+          "user_id UUID REFERENCES users(id)",
+          "rating VARCHAR(30) NOT NULL",
+          "comment TEXT NULL",
+          "created_at TIMESTAMP"
+        ]
+      },
+      {
+        "table": "audit_logs",
+        "description": "Stores important application activities.",
+        "fields": [
+          "id UUID PRIMARY KEY",
+          "organization_id UUID REFERENCES organizations(id)",
+          "actor_id UUID REFERENCES users(id) NULL",
+          "action VARCHAR(100) NOT NULL",
+          "resource_type VARCHAR(100) NULL",
+          "resource_id UUID NULL",
+          "metadata JSONB NULL",
+          "ip_address VARCHAR(50) NULL",
+          "created_at TIMESTAMP"
+        ]
+      }
+    ],
+    "relationships": [
+      "One organization has many users.",
+      "One organization has many collections.",
+      "One organization has many documents.",
+      "One collection can contain many documents.",
+      "One document can have many chunks.",
+      "One document can have many permission records.",
+      "One user can create many conversations.",
+      "One conversation can contain many messages.",
+      "One assistant message can reference many document chunks.",
+      "One message can receive feedback.",
+      "One organization can have many audit logs."
+    ],
+    "database_constraints": [
+      "Use UUID primary keys.",
+      "Use foreign keys for relational integrity.",
+      "Add indexes for frequently queried organization_id fields.",
+      "Add indexes for document status and creation timestamps.",
+      "Use unique constraints for organization slugs and user emails.",
+      "Use transactions for multi-step document lifecycle operations.",
+      "Use soft deletion where required by retention policy."
+    ]
+  },
+
+  "api_specification": {
+    "base_path": "/api/v1",
+    "authentication": "Bearer JWT",
+    "response_format": {
+      "success": {
+        "success": true,
+        "message": "Operation completed successfully.",
+        "data": {}
+      },
+      "error": {
+        "success": false,
+        "message": "An error occurred.",
+        "error": {
+          "code": "ERROR_CODE",
+          "details": {}
+        }
+      }
+    },
+    "endpoints": [
+      {
+        "module": "Authentication",
+        "routes": [
+          {
+            "method": "POST",
+            "path": "/auth/login",
+            "description": "Authenticate a user."
+          },
+          {
+            "method": "POST",
+            "path": "/auth/logout",
+            "description": "Terminate the authenticated session."
+          },
+          {
+            "method": "GET",
+            "path": "/auth/me",
+            "description": "Get current user profile and permissions."
+          },
+          {
+            "method": "POST",
+            "path": "/auth/refresh",
+            "description": "Refresh authentication credentials when supported."
+          }
+        ]
+      },
+      {
+        "module": "Users",
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/users",
+            "description": "List organization users."
+          },
+          {
+            "method": "POST",
+            "path": "/users",
+            "description": "Create a new user."
+          },
+          {
+            "method": "GET",
+            "path": "/users/{user_id}",
+            "description": "Get user details."
+          },
+          {
+            "method": "PATCH",
+            "path": "/users/{user_id}",
+            "description": "Update user information."
+          },
+          {
+            "method": "DELETE",
+            "path": "/users/{user_id}",
+            "description": "Deactivate or delete a user according to policy."
+          }
+        ]
+      },
+      {
+        "module": "Documents",
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/documents",
+            "description": "List accessible documents."
+          },
+          {
+            "method": "POST",
+            "path": "/documents/upload",
+            "description": "Upload documents."
+          },
+          {
+            "method": "GET",
+            "path": "/documents/{document_id}",
+            "description": "Get document details."
+          },
+          {
+            "method": "DELETE",
+            "path": "/documents/{document_id}",
+            "description": "Delete a document."
+          },
+          {
+            "method": "POST",
+            "path": "/documents/{document_id}/retry",
+            "description": "Retry failed document processing."
+          },
+          {
+            "method": "GET",
+            "path": "/documents/{document_id}/status",
+            "description": "Get document processing status."
+          },
+          {
+            "method": "GET",
+            "path": "/documents/{document_id}/download",
+            "description": "Download an authorized original document."
+          }
+        ]
+      },
+      {
+        "module": "Collections",
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/collections",
+            "description": "List accessible collections."
+          },
+          {
+            "method": "POST",
+            "path": "/collections",
+            "description": "Create a collection."
+          },
+          {
+            "method": "GET",
+            "path": "/collections/{collection_id}",
+            "description": "Get collection details."
+          },
+          {
+            "method": "PATCH",
+            "path": "/collections/{collection_id}",
+            "description": "Update collection information."
+          },
+          {
+            "method": "DELETE",
+            "path": "/collections/{collection_id}",
+            "description": "Delete a collection."
+          }
+        ]
+      },
+      {
+        "module": "AI Chat",
+        "routes": [
+          {
+            "method": "POST",
+            "path": "/chat/conversations",
+            "description": "Create a new conversation."
+          },
+          {
+            "method": "GET",
+            "path": "/chat/conversations",
+            "description": "List the current user's conversations."
+          },
+          {
+            "method": "GET",
+            "path": "/chat/conversations/{conversation_id}",
+            "description": "Get conversation messages."
+          },
+          {
+            "method": "PATCH",
+            "path": "/chat/conversations/{conversation_id}",
+            "description": "Rename a conversation."
+          },
+          {
+            "method": "DELETE",
+            "path": "/chat/conversations/{conversation_id}",
+            "description": "Delete a conversation."
+          },
+          {
+            "method": "POST",
+            "path": "/chat/conversations/{conversation_id}/messages",
+            "description": "Submit a question and generate an AI response."
+          },
+          {
+            "method": "POST",
+            "path": "/chat/messages/{message_id}/feedback",
+            "description": "Submit feedback for an AI response."
+          }
+        ]
+      },
+      {
+        "module": "Analytics",
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/analytics/overview",
+            "description": "Get dashboard statistics."
+          },
+          {
+            "method": "GET",
+            "path": "/analytics/usage",
+            "description": "Get AI usage metrics."
+          },
+          {
+            "method": "GET",
+            "path": "/analytics/documents",
+            "description": "Get document processing metrics."
+          },
+          {
+            "method": "GET",
+            "path": "/analytics/activity",
+            "description": "Get recent activity."
+          }
+        ]
+      },
+      {
+        "module": "Administration",
+        "routes": [
+          {
+            "method": "GET",
+            "path": "/admin/audit-logs",
+            "description": "Get organization audit logs."
+          },
+          {
+            "method": "GET",
+            "path": "/admin/settings",
+            "description": "Get organization settings."
+          },
+          {
+            "method": "PATCH",
+            "path": "/admin/settings",
+            "description": "Update organization settings."
+          }
+        ]
+      }
+    ],
+    "http_status_codes": {
+      "200": "Successful request.",
+      "201": "Resource created.",
+      "202": "Request accepted for asynchronous processing.",
+      "204": "Successful request with no response body.",
+      "400": "Invalid request.",
+      "401": "Unauthenticated.",
+      "403": "Unauthorized.",
+      "404": "Resource not found.",
+      "409": "Resource conflict.",
+      "413": "File too large.",
+      "415": "Unsupported media type.",
+      "422": "Validation error.",
+      "429": "Rate limit exceeded.",
+      "500": "Internal server error.",
+      "502": "External provider error.",
+      "503": "Service unavailable."
+    }
+  },
+
+  "frontend_pages": {
+    "public": [
+      {
+        "route": "/login",
+        "name": "Login",
+        "description": "User authentication page.",
+        "components": [
+          "Login form",
+          "Email input",
+          "Password input",
+          "Show password toggle",
+          "Remember me option",
+          "Error notification"
+        ]
+      },
+      {
+        "route": "/forgot-password",
+        "name": "Forgot Password",
+        "description": "Password recovery page, enabled when email delivery is configured."
+      }
+    ],
+    "authenticated": [
+      {
+        "route": "/dashboard",
+        "name": "Dashboard",
+        "description": "Main overview page.",
+        "components": [
+          "Welcome header",
+          "Statistics cards",
+          "Document processing chart",
+          "AI usage chart",
+          "Recent activity",
+          "Quick actions"
+        ]
+      },
+      {
+        "route": "/documents",
+        "name": "Documents",
+        "description": "Document management page.",
+        "components": [
+          "Document table",
+          "Search bar",
+          "Status filters",
+          "Collection filters",
+          "Upload dialog",
+          "Pagination"
+        ]
+      },
+      {
+        "route": "/documents/[id]",
+        "name": "Document Details",
+        "description": "Detailed document information and permissions."
+      },
+      {
+        "route": "/collections",
+        "name": "Collections",
+        "description": "Knowledge collection management."
+      },
+      {
+        "route": "/chat",
+        "name": "AI Assistant",
+        "description": "AI-powered organizational knowledge assistant.",
+        "components": [
+          "Conversation sidebar",
+          "Chat message list",
+          "Message input",
+          "Source citation cards",
+          "Loading indicator",
+          "Suggested questions",
+          "Feedback controls"
+        ]
+      },
+      {
+        "route": "/analytics",
+        "name": "Analytics",
+        "description": "AI and document usage analytics."
+      },
+      {
+        "route": "/settings/profile",
+        "name": "Profile Settings",
+        "description": "Personal account settings."
+      },
+      {
+        "route": "/settings/users",
+        "name": "User Management",
+        "description": "Organization user management for administrators."
+      },
+      {
+        "route": "/settings/organization",
+        "name": "Organization Settings",
+        "description": "Organization-level configuration."
+      },
+      {
+        "route": "/settings/audit-logs",
+        "name": "Audit Logs",
+        "description": "Administrative activity records."
+      }
+    ]
+  },
+
+  "ui_ux_requirements": {
+    "design_direction": "Modern, minimal, professional SaaS dashboard.",
+    "design_principles": [
+      "Clarity over decoration",
+      "Consistent spacing",
+      "Readable typography",
+      "Accessible contrast",
+      "Predictable interactions",
+      "Responsive layouts",
+      "Reusable components"
+    ],
+    "color_palette": {
+      "primary": "#2563EB",
+      "primary_hover": "#1D4ED8",
+      "background": "#F8FAFC",
+      "surface": "#FFFFFF",
+      "text_primary": "#0F172A",
+      "text_secondary": "#64748B",
+      "border": "#E2E8F0",
+      "success": "#16A34A",
+      "warning": "#D97706",
+      "danger": "#DC2626"
+    },
+    "typography": {
+      "font_family": "Inter",
+      "heading_weight": "600",
+      "body_weight": "400",
+      "requirements": [
+        "Clear typography hierarchy",
+        "Readable body text",
+        "Consistent heading sizes"
+      ]
+    },
+    "layout": {
+      "sidebar": "Collapsible left sidebar",
+      "header": "Top navigation bar",
+      "content": "Responsive main content area",
+      "grid": "CSS Grid and Flexbox",
+      "positioning": "Avoid unnecessary absolute positioning"
+    },
+    "responsive_breakpoints": {
+      "mobile": "Below 640px",
+      "tablet": "640px to 1023px",
+      "desktop": "1024px and above"
+    },
+    "accessibility": [
+      "WCAG 2.1 AA target",
+      "Keyboard navigation",
+      "Visible focus indicators",
+      "Semantic HTML",
+      "Accessible form labels",
+      "Sufficient color contrast",
+      "Screen reader friendly controls"
+    ],
+    "interaction_states": [
+      "Default",
+      "Hover",
+      "Focus",
+      "Active",
+      "Disabled",
+      "Loading",
+      "Success",
+      "Error",
+      "Empty"
+    ]
+  },
+
+  "non_functional_requirements": {
+    "performance": [
+      {
+        "id": "NFR-001",
+        "requirement": "Dashboard initial content should load within 3 seconds under the agreed test environment."
+      },
+      {
+        "id": "NFR-002",
+        "requirement": "Standard API requests should target a response time below 500ms at the 95th percentile, excluding external AI calls and large file operations."
+      },
+      {
+        "id": "NFR-003",
+        "requirement": "Document processing must run asynchronously for potentially long-running operations."
+      },
+      {
+        "id": "NFR-004",
+        "requirement": "Use pagination for large datasets."
+      }
+    ],
+    "security": [
+      {
+        "id": "NFR-005",
+        "requirement": "Use HTTPS in production."
+      },
+      {
+        "id": "NFR-006",
+        "requirement": "Hash passwords using a secure password hashing algorithm."
+      },
+      {
+        "id": "NFR-007",
+        "requirement": "Protect authentication tokens and use secure cookie settings where applicable."
+      },
+      {
+        "id": "NFR-008",
+        "requirement": "Validate and sanitize user input."
+      },
+      {
+        "id": "NFR-009",
+        "requirement": "Prevent SQL injection and common web application vulnerabilities."
+      },
+      {
+        "id": "NFR-010",
+        "requirement": "Apply rate limiting to authentication, upload, and AI chat endpoints."
+      },
+      {
+        "id": "NFR-011",
+        "requirement": "Never expose API keys or secrets in frontend code."
+      },
+      {
+        "id": "NFR-012",
+        "requirement": "Enforce organization isolation and document-level authorization."
+      }
+    ],
+    "reliability": [
+      {
+        "id": "NFR-013",
+        "requirement": "External AI provider failures must not crash the application."
+      },
+      {
+        "id": "NFR-014",
+        "requirement": "Failed document jobs must be observable and retryable."
+      },
+      {
+        "id": "NFR-015",
+        "requirement": "Critical document operations must maintain consistency between PostgreSQL, object storage, and Qdrant."
+      }
+    ],
+    "maintainability": [
+      {
+        "id": "NFR-016",
+        "requirement": "Use modular backend architecture."
+      },
+      {
+        "id": "NFR-017",
+        "requirement": "Use reusable frontend components."
+      },
+      {
+        "id": "NFR-018",
+        "requirement": "Maintain API documentation."
+      },
+      {
+        "id": "NFR-019",
+        "requirement": "Use automated tests for critical business logic."
+      },
+      {
+        "id": "NFR-020",
+        "requirement": "Use environment variables for environment-specific configuration."
+      }
+    ]
+  },
+
+  "error_handling": {
+    "frontend": [
+      "Display clear and actionable error messages.",
+      "Show loading states during asynchronous operations.",
+      "Provide retry actions when appropriate.",
+      "Prevent duplicate form submissions.",
+      "Display empty states when no data is available."
+    ],
+    "backend": [
+      "Use centralized exception handling.",
+      "Return consistent error response structures.",
+      "Log unexpected exceptions.",
+      "Avoid exposing internal stack traces to clients.",
+      "Validate external provider responses."
+    ],
+    "document_processing": [
+      "Handle corrupted files.",
+      "Handle unsupported document formats.",
+      "Handle extraction failures.",
+      "Handle embedding provider failures.",
+      "Handle Qdrant indexing failures.",
+      "Support retrying failed processing jobs."
+    ],
+    "ai": [
+      "Handle LLM timeouts.",
+      "Handle provider rate limits.",
+      "Handle invalid model responses.",
+      "Handle empty retrieval results.",
+      "Handle token limit errors.",
+      "Avoid fabricating citations."
+    ]
+  },
+
+  "testing_strategy": {
+    "unit_testing": {
+      "backend": "Pytest",
+      "frontend": "Vitest",
+      "coverage_targets": {
+        "critical_business_logic": "At least 80%",
+        "overall": "At least 70%"
+      },
+      "test_cases": [
+        "Authentication validation",
+        "Permission checks",
+        "Document metadata validation",
+        "Chunking logic",
+        "Retrieval filtering",
+        "Citation mapping",
+        "Analytics calculations"
+      ]
+    },
+    "integration_testing": {
+      "framework": "Pytest",
+      "test_cases": [
+        "Login API",
+        "User management API",
+        "Document upload and processing",
+        "PostgreSQL persistence",
+        "Qdrant indexing",
+        "RAG retrieval",
+        "AI response generation",
+        "Document permission enforcement"
+      ]
+    },
+    "end_to_end_testing": {
+      "framework": "Playwright",
+      "test_cases": [
+        "User login and logout",
+        "Dashboard navigation",
+        "Document upload",
+        "Document deletion",
+        "Collection management",
+        "AI chat interaction",
+        "Citation display",
+        "Role-based navigation",
+        "Unauthorized access prevention"
+      ]
+    },
+    "security_testing": [
+      "Cross-organization access attempts",
+      "Unauthorized document retrieval",
+      "JWT validation",
+      "Input validation",
+      "Rate limiting",
+      "File upload validation",
+      "Role escalation attempts"
+    ]
+  },
+
+  "development_phases": [
+    {
+      "phase": 1,
+      "name": "Project Foundation and UI",
+      "priority": "MUST",
+      "goal": "Establish the frontend foundation and build the complete user interface using realistic mock data.",
+      "tasks": [
+        "Initialize Next.js with TypeScript.",
+        "Configure Tailwind CSS.",
+        "Establish folder structure.",
+        "Create reusable UI components.",
+        "Implement design tokens.",
+        "Build login page.",
+        "Build dashboard.",
+        "Build document management page.",
+        "Build collections page.",
+        "Build AI chat interface.",
+        "Build analytics page.",
+        "Build settings pages.",
+        "Implement role-based mock navigation.",
+        "Implement responsive layouts."
+      ],
+      "deliverables": [
+        "Working frontend application",
+        "Reusable component library",
+        "Mock data layer",
+        "Responsive pages"
+      ],
+      "completion_criteria": [
+        "All planned pages are accessible.",
+        "Navigation works.",
+        "Mock interactions work.",
+        "Responsive layouts are implemented.",
+        "No major UI page is left as a placeholder."
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Backend Foundation",
+      "priority": "MUST",
+      "goal": "Establish backend services, database models, and authentication.",
+      "tasks": [
+        "Initialize FastAPI project.",
+        "Configure PostgreSQL.",
+        "Configure SQLAlchemy.",
+        "Configure Alembic.",
+        "Create database models.",
+        "Implement authentication.",
+        "Implement JWT validation.",
+        "Implement organization management.",
+        "Implement user management.",
+        "Implement RBAC.",
+        "Create API response standards.",
+        "Add backend unit tests."
+      ],
+      "deliverables": [
+        "Working FastAPI service",
+        "PostgreSQL schema",
+        "Authentication APIs",
+        "Authorization middleware"
+      ],
+      "completion_criteria": [
+        "Users can authenticate.",
+        "Roles are enforced.",
+        "Organization boundaries are enforced.",
+        "Database migrations work.",
+        "Critical authentication tests pass."
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Document Management",
+      "priority": "MUST",
+      "goal": "Implement document upload, storage, and management.",
+      "tasks": [
+        "Configure object storage.",
+        "Implement file upload API.",
+        "Implement file validation.",
+        "Implement document metadata management.",
+        "Implement document listing and filtering.",
+        "Implement document deletion.",
+        "Implement collections.",
+        "Implement document processing status."
+      ],
+      "deliverables": [
+        "Document management API",
+        "Document upload interface integration",
+        "Document metadata storage"
+      ],
+      "completion_criteria": [
+        "Supported files can be uploaded.",
+        "Document metadata is persisted.",
+        "Document permissions are enforced.",
+        "Document lifecycle is traceable."
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "RAG and Vector Search",
+      "priority": "MUST",
+      "goal": "Build the complete document ingestion and retrieval pipeline.",
+      "tasks": [
+        "Implement PDF extraction.",
+        "Implement DOCX extraction.",
+        "Implement TXT extraction.",
+        "Implement text normalization.",
+        "Implement document chunking.",
+        "Integrate embedding provider.",
+        "Configure Qdrant.",
+        "Implement vector indexing.",
+        "Implement semantic retrieval.",
+        "Implement metadata filtering.",
+        "Implement document-level access filtering."
+      ],
+      "deliverables": [
+        "Document ingestion pipeline",
+        "Embedding generation service",
+        "Qdrant vector index",
+        "Semantic retrieval service"
+      ],
+      "completion_criteria": [
+        "Uploaded documents can be indexed.",
+        "Relevant chunks can be retrieved.",
+        "Retrieved results respect permissions.",
+        "Processing failures can be identified and retried."
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "AI Chat and Citations",
+      "priority": "MUST",
+      "goal": "Implement contextual AI question answering.",
+      "tasks": [
+        "Integrate LLM provider.",
+        "Implement prompt templates.",
+        "Implement context construction.",
+        "Implement response generation.",
+        "Implement citation mapping.",
+        "Implement conversation management.",
+        "Implement message persistence.",
+        "Integrate frontend chat interface.",
+        "Implement token usage tracking.",
+        "Implement AI error handling."
+      ],
+      "deliverables": [
+        "Working AI assistant",
+        "RAG-based question answering",
+        "Source citation interface",
+        "Conversation history"
+      ],
+      "completion_criteria": [
+        "Users can ask questions.",
+        "Responses use retrieved context.",
+        "Source citations are displayed.",
+        "Conversation history is saved.",
+        "Unauthorized document content is never returned."
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "Analytics and Administration",
+      "priority": "SHOULD",
+      "goal": "Provide operational monitoring and organization management.",
+      "tasks": [
+        "Implement dashboard statistics.",
+        "Implement usage analytics.",
+        "Implement activity tracking.",
+        "Implement audit logs.",
+        "Implement organization settings.",
+        "Implement user feedback."
+      ],
+      "deliverables": [
+        "Analytics dashboard",
+        "Administrative management features",
+        "Audit log interface"
+      ],
+      "completion_criteria": [
+        "Analytics use persisted backend data.",
+        "Organization boundaries are respected.",
+        "Administrative operations are logged."
+      ]
+    },
+    {
+      "phase": 7,
+      "name": "Advanced AI and Optimization",
+      "priority": "COULD",
+      "goal": "Improve retrieval quality, orchestration, and application performance.",
+      "tasks": [
+        "Integrate Redis caching.",
+        "Implement conversation memory improvements.",
+        "Evaluate hybrid search.",
+        "Evaluate reranking.",
+        "Integrate LangGraph for multi-step workflows.",
+        "Optimize embedding and retrieval performance.",
+        "Implement AI feedback analysis."
+      ],
+      "deliverables": [
+        "Optimized retrieval pipeline",
+        "Advanced conversation workflow",
+        "Caching implementation"
+      ],
+      "completion_criteria": [
+        "Performance improvements are measured.",
+        "Advanced workflows do not bypass authorization.",
+        "Retrieval quality is evaluated against a test dataset."
+      ]
+    },
+    {
+      "phase": 8,
+      "name": "Testing, Deployment, and Documentation",
+      "priority": "MUST",
+      "goal": "Prepare NexusAI for a demonstrable production-style deployment.",
+      "tasks": [
+        "Complete unit tests.",
+        "Complete integration tests.",
+        "Complete end-to-end tests.",
+        "Perform security testing.",
+        "Configure Docker.",
+        "Create Docker Compose configuration.",
+        "Configure environment variables.",
+        "Prepare database migrations.",
+        "Configure deployment.",
+        "Write README.",
+        "Write API documentation.",
+        "Prepare demonstration data."
+      ],
+      "deliverables": [
+        "Dockerized application",
+        "Test reports",
+        "Deployment configuration",
+        "Technical documentation",
+        "Demonstration-ready application"
+      ],
+      "completion_criteria": [
+        "Core workflows pass testing.",
+        "Application can run using documented setup instructions.",
+        "Secrets are not committed to source control.",
+        "Database migrations can be executed.",
+        "README contains setup and deployment instructions."
+      ]
+    }
+  ],
+
+  "mvp_scope": {
+    "included": [
+      "Authentication",
+      "Three user roles",
+      "Organization isolation",
+      "Dashboard",
+      "Document upload",
+      "PDF, DOCX, and TXT extraction",
+      "Document chunking",
+      "Embedding generation",
+      "Qdrant vector storage",
+      "Semantic search",
+      "RAG-based AI chat",
+      "Source citations",
+      "Conversation history",
+      "Document permissions",
+      "Docker development environment"
+    ],
+    "excluded_from_mvp": [
+      "Multi-agent AI workflows",
+      "Advanced LangGraph orchestration",
+      "Complex MLOps pipelines",
+      "Custom model fine-tuning",
+      "Voice interaction",
+      "OCR for scanned documents",
+      "Real-time collaborative document editing",
+      "Enterprise SSO",
+      "Advanced billing and subscription management",
+      "Mobile native application"
+    ]
+  },
+
+  "future_enhancements": [
+    {
+      "id": "FUT-001",
+      "name": "Multi-Agent Knowledge Assistant",
+      "description": "Use LangGraph to orchestrate specialized agents for retrieval, summarization, and analysis."
+    },
+    {
+      "id": "FUT-002",
+      "name": "Hybrid Search",
+      "description": "Combine semantic vector retrieval and keyword-based search."
+    },
+    {
+      "id": "FUT-003",
+      "name": "Advanced Reranking",
+      "description": "Improve retrieval relevance using a reranking model."
+    },
+    {
+      "id": "FUT-004",
+      "name": "OCR Support",
+      "description": "Extract text from scanned PDF documents and images."
+    },
+    {
+      "id": "FUT-005",
+      "name": "External Knowledge Connectors",
+      "description": "Connect external knowledge repositories through controlled integrations."
+    },
+    {
+      "id": "FUT-006",
+      "name": "MCP Integration",
+      "description": "Expose selected knowledge capabilities through Model Context Protocol."
+    },
+    {
+      "id": "FUT-007",
+      "name": "Advanced AI Evaluation",
+      "description": "Evaluate retrieval relevance, answer groundedness, and citation accuracy."
+    }
+  ],
+
+  "environment_configuration": {
+    "files": [
+      {
+        "name": ".env",
+        "scope": "Backend",
+        "variables": [
+          "APP_ENV",
+          "APP_SECRET_KEY",
+          "DATABASE_URL",
+          "JWT_SECRET_KEY",
+          "JWT_ACCESS_TOKEN_EXPIRE_MINUTES",
+          "REDIS_URL",
+          "QDRANT_URL",
+          "QDRANT_API_KEY",
+          "OBJECT_STORAGE_ENDPOINT",
+          "OBJECT_STORAGE_ACCESS_KEY",
+          "OBJECT_STORAGE_SECRET_KEY",
+          "OBJECT_STORAGE_BUCKET",
+          "LLM_PROVIDER",
+          "LLM_API_KEY",
+          "LLM_MODEL",
+          "EMBEDDING_PROVIDER",
+          "EMBEDDING_API_KEY",
+          "EMBEDDING_MODEL"
+        ]
+      },
+      {
+        "name": ".env.local",
+        "scope": "Frontend",
+        "variables": [
+          "NEXT_PUBLIC_API_URL"
+        ]
+      }
+    ],
+    "security_rules": [
+      "Never commit environment files containing secrets.",
+      "Provide .env.example with placeholder values.",
+      "Only expose explicitly public variables to the frontend.",
+      "Use separate credentials for development and production."
+    ]
+  },
+
+  "repository_structure": {
+    "root": "nexusai/",
+    "directories": {
+      "frontend": {
+        "path": "frontend/",
+        "description": "Next.js application.",
+        "structure": [
+          "src/app/",
+          "src/components/",
+          "src/features/",
+          "src/hooks/",
+          "src/lib/",
+          "src/services/",
+          "src/stores/",
+          "src/types/",
+          "src/config/",
+          "public/"
+        ]
+      },
+      "backend": {
+        "path": "backend/",
+        "description": "FastAPI application.",
+        "structure": [
+          "app/api/v1/",
+          "app/core/",
+          "app/models/",
+          "app/schemas/",
+          "app/services/",
+          "app/repositories/",
+          "app/permissions/",
+          "app/workers/",
+          "app/rag/",
+          "app/utils/",
+          "tests/",
+          "alembic/"
+        ]
+      },
+      "infrastructure": {
+        "path": "infrastructure/",
+        "description": "Infrastructure and deployment configuration.",
+        "structure": [
+          "docker/",
+          "scripts/",
+          "monitoring/"
+        ]
+      },
+      "documentation": {
+        "path": "docs/",
+        "description": "Project documentation.",
+        "structure": [
+          "architecture/",
+          "api/",
+          "database/",
+          "development/",
+          "deployment/"
+        ]
+      }
+    },
+    "root_files": [
+      "README.md",
+      "PRD.json",
+      "docker-compose.yml",
+      ".gitignore",
+      ".env.example"
+    ]
+  },
+
+  "development_rules": {
+    "architecture": [
+      "Follow the architecture defined in this PRD.",
+      "Do not introduce unnecessary microservices.",
+      "Keep frontend and backend responsibilities separated.",
+      "Use service and repository layers for backend business logic and data access.",
+      "Use reusable frontend components.",
+      "Keep business logic out of presentation components.",
+      "Use database migrations for schema changes."
+    ],
+    "coding_standards": [
+      "Use TypeScript strict mode.",
+      "Use Python type hints.",
+      "Use consistent naming conventions.",
+      "Write clear function and variable names.",
+      "Avoid duplicated business logic.",
+      "Use structured error handling.",
+      "Document complex business logic.",
+      "Do not hardcode secrets."
+    ],
+    "ai_coding_agent_rules": [
+      "Read PRD.json before implementing any feature.",
+      "Inspect the existing project structure before modifying files.",
+      "Implement features incrementally.",
+      "Do not rewrite the entire application when fixing a small issue.",
+      "Do not change the selected technology stack without explicit approval.",
+      "Do not create duplicate components or services.",
+      "Do not invent backend endpoints that are not documented.",
+      "Keep API contracts consistent between frontend and backend.",
+      "Use mock data only during the frontend development phase.",
+      "Replace mock data with real API integration in the appropriate phase.",
+      "Run relevant tests after making changes.",
+      "Report modified files and implementation status after each task."
+    ]
+  },
+
+  "project_constraints": [
+    "The initial version is a web application, not a native mobile application.",
+    "The initial architecture is a modular monolith.",
+    "PostgreSQL is the primary relational database.",
+    "Qdrant is the vector database.",
+    "FastAPI is the backend framework.",
+    "Next.js and TypeScript are used for the frontend.",
+    "AI provider integrations must be configurable.",
+    "All AI retrieval operations must enforce document authorization.",
+    "The initial development process prioritizes a complete frontend UI before full backend integration.",
+    "Advanced AI orchestration is deferred until the core RAG pipeline works reliably."
+  ],
+
+  "definition_of_done": [
+    "The feature satisfies its acceptance criteria.",
+    "The implementation follows the approved architecture.",
+    "Input validation is implemented.",
+    "Authorization checks are implemented where required.",
+    "Loading, empty, success, and error states are handled.",
+    "Relevant automated tests pass.",
+    "No secrets are exposed.",
+    "API documentation is updated when endpoints change.",
+    "The implementation is documented.",
+    "The feature works with the integrated application."
+  ]
+}
