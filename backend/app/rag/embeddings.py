@@ -8,7 +8,18 @@ class EmbeddingService:
     API: OpenAI/Gemini compatible (set EMBEDDING_PROVIDER + EMBEDDING_API_KEY)
     """
 
+    _instance: "EmbeddingService | None" = None
+
+    def __new__(cls) -> "EmbeddingService":
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self) -> None:
+        if self._initialized:
+            return
+        self._initialized = True
         self._provider = settings.EMBEDDING_PROVIDER
         self._model_name = settings.EMBEDDING_MODEL
         self._local_model = None
@@ -19,7 +30,7 @@ class EmbeddingService:
             from sentence_transformers import SentenceTransformer
 
             self._local_model = SentenceTransformer(self._model_name)
-            self._dimension = self._local_model.get_sentence_embedding_dimension()
+            self._dimension = self._local_model.get_embedding_dimension()
         return self._local_model
 
     @property
