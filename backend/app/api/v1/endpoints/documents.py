@@ -5,7 +5,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
 from fastapi.responses import StreamingResponse
 
-from app.api.deps import DbSession, require_permission
+from app.api.deps import DbSession, require_any_permission, require_permission
 from app.models.user import User
 from app.schemas.document import (
     DocumentListResponse,
@@ -28,7 +28,7 @@ router = APIRouter(prefix="/documents", tags=["Documents"])
 async def get_documents(
     db: DbSession,
     current_user: Annotated[
-        User, Depends(require_permission("documents.view"))
+        User, Depends(require_any_permission("documents.view", "documents.view_authorized"))
     ],
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
@@ -37,7 +37,8 @@ async def get_documents(
     collection_id: uuid.UUID | None = None,
 ) -> DocumentListResponse:
     docs, total = await list_documents(
-        db, current_user.organization_id, page, page_size, search, status_filter, collection_id
+        db, current_user.organization_id, current_user.id, current_user.role,
+        page, page_size, search, status_filter, collection_id,
     )
     return DocumentListResponse(
         items=[DocumentResponse.model_validate(d) for d in docs],
@@ -87,7 +88,7 @@ async def get_document_detail(
     document_id: uuid.UUID,
     db: DbSession,
     current_user: Annotated[
-        User, Depends(require_permission("documents.view"))
+        User, Depends(require_any_permission("documents.view", "documents.view_authorized"))
     ],
 ) -> DocumentResponse:
     doc = await get_document(db, document_id, current_user.organization_id)
@@ -99,7 +100,7 @@ async def get_document_status(
     document_id: uuid.UUID,
     db: DbSession,
     current_user: Annotated[
-        User, Depends(require_permission("documents.view"))
+        User, Depends(require_any_permission("documents.view", "documents.view_authorized"))
     ],
 ) -> DocumentStatusResponse:
     doc = await get_document(db, document_id, current_user.organization_id)
@@ -115,7 +116,7 @@ async def download_document(
     document_id: uuid.UUID,
     db: DbSession,
     current_user: Annotated[
-        User, Depends(require_permission("documents.view"))
+        User, Depends(require_any_permission("documents.view", "documents.view_authorized"))
     ],
 ) -> StreamingResponse:
     doc = await get_document(db, document_id, current_user.organization_id)
@@ -132,7 +133,7 @@ async def process_document_endpoint(
     document_id: uuid.UUID,
     db: DbSession,
     current_user: Annotated[
-        User, Depends(require_permission("documents.view"))
+        User, Depends(require_any_permission("documents.view", "documents.view_authorized"))
     ],
 ) -> DocumentResponse:
     from app.rag.pipeline import process_document
@@ -145,7 +146,7 @@ async def process_document_endpoint(
 async def process_all_documents(
     db: DbSession,
     current_user: Annotated[
-        User, Depends(require_permission("documents.view"))
+        User, Depends(require_any_permission("documents.view", "documents.view_authorized"))
     ],
 ) -> dict[str, Any]:
     from app.rag.pipeline import process_pending_documents

@@ -18,6 +18,8 @@ from app.services.storage import (
 async def list_documents(
     db: AsyncSession,
     organization_id: uuid.UUID,
+    user_id: uuid.UUID,
+    user_role: str,
     page: int = 1,
     page_size: int = 20,
     search: str | None = None,
@@ -28,6 +30,16 @@ async def list_documents(
         Document.organization_id == organization_id,
         Document.deleted_at.is_(None),
     )
+
+    # EMPLOYEE can only see authorized documents
+    if user_role == "EMPLOYEE":
+        from app.services.permissions import get_authorized_document_ids
+
+        authorized_ids = await get_authorized_document_ids(db, user_id, user_role)
+        if authorized_ids is not None:
+            if not authorized_ids:
+                return [], 0
+            base = base.where(Document.id.in_(authorized_ids))
 
     if search:
         base = base.where(Document.name.ilike(f"%{search}%"))

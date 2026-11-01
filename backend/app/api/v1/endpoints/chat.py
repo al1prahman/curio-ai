@@ -102,6 +102,7 @@ async def ask_question_endpoint(
 ) -> AskQuestionResponse:
     conv = await get_conversation(db, conversation_id, current_user.id, current_user.organization_id)
     result = await ask_question(
-        db, conv.id, current_user.id, current_user.organization_id, data.question
+        db, conv.id, current_user.id, current_user.organization_id, data.question,
+        current_user.role,
     )
     return AskQuestionResponse(**result)

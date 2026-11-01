@@ -78,3 +78,19 @@ def require_permission(permission: str) -> Callable[..., Awaitable[User]]:
         return current_user
 
     return checker
+
+
+def require_any_permission(*permissions: str) -> Callable[..., Awaitable[User]]:
+    """Dependency factory: enforce that the user has at least one of the permissions."""
+
+    async def checker(current_user: CurrentUser) -> User:  # noqa: ANN202
+        from app.core.permissions import role_has_permission
+
+        if not any(role_has_permission(current_user.role, p) for p in permissions):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission denied: requires one of {permissions}",
+            )
+        return current_user
+
+    return checker

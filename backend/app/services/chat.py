@@ -101,6 +101,7 @@ async def ask_question(
     user_id: uuid.UUID,
     organization_id: uuid.UUID,
     question: str,
+    current_role: str = "EMPLOYEE",
 ) -> dict[str, Any]:
     """Full RAG chat flow: save Q -> retrieve -> generate -> save A + citations."""
     start_time = time.time()
@@ -128,13 +129,17 @@ async def ask_question(
     embedding_service = EmbeddingService()
     query_vector = embedding_service.embed_query(question)
 
-    # 4. Retrieve relevant chunks (org-isolated)
+    # 4. Retrieve relevant chunks (org-isolated + permission-filtered)
+    from app.services.permissions import get_authorized_document_ids
+
+    authorized_doc_ids = await get_authorized_document_ids(db, user_id, current_role)
     vector_store = VectorStore()
     chunks = vector_store.search(
         query_vector=query_vector,
         organization_id=organization_id,
         top_k=settings.RAG_TOP_K,
         score_threshold=settings.RAG_SIMILARITY_THRESHOLD,
+        document_ids=authorized_doc_ids,
     )
 
     # 5. Enrich chunks with document names + chunk PKs
