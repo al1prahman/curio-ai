@@ -1,3 +1,5 @@
+from typing import Any
+
 SYSTEM_PROMPT = """You are CurioAI, an enterprise knowledge assistant.
 Answer questions based ONLY on the provided context from organizational
 documents and the recent conversation history.
@@ -13,8 +15,8 @@ Rules:
 
 def build_rag_prompt(
     question: str,
-    context_chunks: list[dict],
-    recent_messages: list | None = None,
+    context_chunks: list[dict[str, Any]],
+    recent_messages: list[Any] | None = None,
 ) -> str:
     """Build the user message with retrieved context and conversation history."""
     parts = []
@@ -23,8 +25,8 @@ def build_rag_prompt(
     if recent_messages:
         history_lines = []
         for msg in recent_messages:
-            role = "User" if msg.role == "user" else "Assistant"
-            content = msg.content[:300]
+            role = "User" if getattr(msg, "role", "") == "user" else "Assistant"
+            content = str(getattr(msg, "content", ""))[:300]
             history_lines.append(f"{role}: {content}")
         if history_lines:
             parts.append("Recent conversation:\n" + "\n".join(history_lines))

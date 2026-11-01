@@ -1,3 +1,5 @@
+from typing import Any
+
 from app.core.config import settings
 
 
@@ -9,11 +11,11 @@ class EmbeddingService:
     """
 
     _instance: "EmbeddingService | None" = None
+    _initialized: bool = False
 
     def __new__(cls) -> "EmbeddingService":
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._initialized = False
         return cls._instance
 
     def __init__(self) -> None:
@@ -25,12 +27,13 @@ class EmbeddingService:
         self._local_model = None
         self._dimension: int | None = None
 
-    def _get_local_model(self):
+    def _get_local_model(self) -> Any:
         if self._local_model is None:
             from sentence_transformers import SentenceTransformer
 
             self._local_model = SentenceTransformer(self._model_name)
-            self._dimension = self._local_model.get_embedding_dimension()
+            if self._local_model is not None:
+                self._dimension = self._local_model.get_embedding_dimension()
         return self._local_model
 
     @property
@@ -41,7 +44,7 @@ class EmbeddingService:
             else:
                 # Default dimensions for common API models
                 self._dimension = 1536
-        return self._dimension
+        return self._dimension or 1536
 
     def embed_texts(self, texts: list[str]) -> list[list[float]]:
         if self._provider == "local":

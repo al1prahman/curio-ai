@@ -1,6 +1,6 @@
 import io
 import uuid
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
 from fastapi.responses import StreamingResponse
@@ -147,7 +147,7 @@ async def process_all_documents(
     current_user: Annotated[
         User, Depends(require_permission("documents.view"))
     ],
-) -> dict:
+) -> dict[str, Any]:
     from app.rag.pipeline import process_pending_documents
 
     count = await process_pending_documents(db, current_user.organization_id)

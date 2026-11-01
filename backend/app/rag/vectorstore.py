@@ -1,4 +1,5 @@
 import uuid
+from typing import Any
 
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
@@ -43,7 +44,7 @@ class VectorStore:
 
     def upsert_chunks(
         self,
-        chunks: list[dict],
+        chunks: list[dict[str, Any]],
     ) -> None:
         """Upsert chunks. Each chunk: {id, vector, organization_id, document_id, chunk_index, page_number, content}"""
         points = [
@@ -69,23 +70,25 @@ class VectorStore:
         top_k: int = 5,
         score_threshold: float = 0.0,
         document_ids: list[uuid.UUID] | None = None,
-    ) -> list[dict]:
+    ) -> list[dict[str, Any]]:
         must_conditions = [
             FieldCondition(key="organization_id", match=MatchValue(value=str(organization_id)))
         ]
 
         if document_ids:
+            from qdrant_client.models import MatchAny
+
             must_conditions.append(
                 FieldCondition(
                     key="document_id",
-                    match=MatchValue(value=[str(d) for d in document_ids]),
+                    match=MatchAny(any=[str(d) for d in document_ids]),
                 )
             )
 
         results = self._client.query_points(
             collection_name=self.COLLECTION_NAME,
             query=query_vector,
-            query_filter=Filter(must=must_conditions),
+            query_filter=Filter(must=list(must_conditions)),
             limit=top_k,
             score_threshold=score_threshold,
         ).points
@@ -93,10 +96,10 @@ class VectorStore:
             {
                 "id": hit.id,
                 "score": hit.score,
-                "document_id": hit.payload.get("document_id"),
-                "chunk_index": hit.payload.get("chunk_index"),
-                "page_number": hit.payload.get("page_number"),
-                "content": hit.payload.get("content"),
+                "document_id": (hit.payload or {}).get("document_id"),
+                "chunk_index": (hit.payload or {}).get("chunk_index"),
+                "page_number": (hit.payload or {}).get("page_number"),
+                "content": (hit.payload or {}).get("content"),
             }
             for hit in results
         ]

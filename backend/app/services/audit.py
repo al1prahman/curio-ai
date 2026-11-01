@@ -1,4 +1,5 @@
 import uuid
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +13,7 @@ async def log_action(
     actor_id: uuid.UUID | None = None,
     resource_type: str | None = None,
     resource_id: uuid.UUID | None = None,
-    metadata: dict | None = None,
+    metadata: dict[str, Any] | None = None,
     ip_address: str | None = None,
 ) -> AuditLog:
     """Record an audit log entry."""

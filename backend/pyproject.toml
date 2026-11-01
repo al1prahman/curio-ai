@@ -70,6 +70,17 @@ select = [
 python_version = "3.13"
 strict = true
 ignore_missing_imports = true
+exclude = ["alembic/", "tests/"]
+
+[[tool.mypy.overrides]]
+module = "sentence_transformers.*"
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = "minio.*"
+ignore_missing_imports = true
+follow_imports = "skip"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

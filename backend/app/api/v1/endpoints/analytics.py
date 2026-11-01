@@ -1,5 +1,5 @@
 from datetime import UTC
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/analytics", tags=["Analytics"])
 async def get_overview(
     db: DbSession,
     current_user: Annotated[User, Depends(require_permission("analytics.view"))],
-) -> dict:
+) -> dict[str, Any]:
     """Dashboard statistics for the current organization."""
     org_id = current_user.organization_id
 
@@ -65,7 +65,7 @@ async def get_usage(
     db: DbSession,
     current_user: Annotated[User, Depends(require_permission("analytics.view"))],
     days: int = Query(7, ge=1, le=90),
-) -> dict:
+) -> dict[str, Any]:
     """AI usage metrics over the last N days."""
     from datetime import datetime, timedelta
 
@@ -111,7 +111,7 @@ async def get_activity(
     db: DbSession,
     current_user: Annotated[User, Depends(require_permission("analytics.view"))],
     limit: int = Query(20, ge=1, le=100),
-) -> dict:
+) -> dict[str, Any]:
     """Recent activity from audit logs for this organization."""
     org_id = current_user.organization_id
 

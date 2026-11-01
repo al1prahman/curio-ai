@@ -1,3 +1,5 @@
+from typing import Any
+
 import httpx
 
 from app.core.config import settings
@@ -15,7 +17,7 @@ class LLMService:
         self._api_key = settings.LLM_API_KEY
         self._base_url = settings.LLM_BASE_URL
 
-    def generate(self, system_prompt: str, user_message: str) -> dict:
+    def generate(self, system_prompt: str, user_message: str) -> dict[str, Any]:
         """Generate a response. Returns {content, input_tokens, output_tokens}."""
         if self._provider == "mock":
             return self._generate_mock(system_prompt, user_message)
@@ -23,7 +25,7 @@ class LLMService:
             return self._generate_gemini(system_prompt, user_message)
         return self._generate_openai_compatible(system_prompt, user_message)
 
-    def _generate_mock(self, system_prompt: str, user_message: str) -> dict:
+    def _generate_mock(self, system_prompt: str, user_message: str) -> dict[str, Any]:
         """Mock provider for development/testing without API keys."""
         # Extract source count from the prompt
         source_count = user_message.count("[Source ")
@@ -45,7 +47,7 @@ class LLMService:
             "output_tokens": len(content) // 4,
         }
 
-    def _generate_gemini(self, system_prompt: str, user_message: str) -> dict:
+    def _generate_gemini(self, system_prompt: str, user_message: str) -> dict[str, Any]:
         url = (
             f"https://generativelanguage.googleapis.com/v1beta/models/"
             f"{self._model}:generateContent?key={self._api_key}"
@@ -69,7 +71,7 @@ class LLMService:
             "output_tokens": usage.get("candidatesTokenCount", 0),
         }
 
-    def _generate_openai_compatible(self, system_prompt: str, user_message: str) -> dict:
+    def _generate_openai_compatible(self, system_prompt: str, user_message: str) -> dict[str, Any]:
         base = self._base_url or self._default_base_url()
         url = f"{base}/chat/completions"
         headers = {"Authorization": f"Bearer {self._api_key}"}

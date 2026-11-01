@@ -1,3 +1,4 @@
+from collections.abc import Awaitable, Callable
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -63,10 +64,10 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 DbSession = Annotated[AsyncSession, Depends(get_db)]
 
 
-def require_permission(permission: str):
+def require_permission(permission: str) -> Callable[..., Awaitable[User]]:
     """Dependency factory: enforce that the current user's role has the permission."""
 
-    async def checker(current_user: CurrentUser) -> User:
+    async def checker(current_user: CurrentUser) -> User:  # noqa: ANN202
         from app.core.permissions import role_has_permission
 
         if not role_has_permission(current_user.role, permission):

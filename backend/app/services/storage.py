@@ -43,7 +43,8 @@ class StorageService:
     def download(self, storage_key: str) -> bytes:
         response = self._client.get_object(self._bucket, storage_key)
         try:
-            return response.read()
+            data: bytes = response.read()
+            return data
         finally:
             response.close()
             response.release_conn()

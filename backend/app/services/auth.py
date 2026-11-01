@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,7 +29,7 @@ async def authenticate_user(
 async def create_user(
     db: AsyncSession,
     data: UserCreate,
-    organization_id,
+    organization_id: uuid.UUID,
 ) -> User:
     result = await db.execute(select(User).where(User.email == data.email))
     if result.scalar_one_or_none() is not None:

@@ -1,5 +1,6 @@
 import time
 import uuid
+from typing import Any
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -100,7 +101,7 @@ async def ask_question(
     user_id: uuid.UUID,
     organization_id: uuid.UUID,
     question: str,
-) -> dict:
+) -> dict[str, Any]:
     """Full RAG chat flow: save Q -> retrieve -> generate -> save A + citations."""
     start_time = time.time()
 
