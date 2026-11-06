@@ -14,7 +14,7 @@ class RedisService:
     @classmethod
     def get_client(cls) -> aioredis.Redis:
         if cls._pool is None:
-            cls._pool = aioredis.from_url(
+            cls._pool = aioredis.from_url(  # type: ignore[no-untyped-call]  # redis<6 ships from_url untyped
                 settings.REDIS_URL,
                 encoding="utf-8",
                 decode_responses=True,

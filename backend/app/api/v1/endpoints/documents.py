@@ -1,11 +1,14 @@
 import io
+import logging
 import uuid
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from fastapi.responses import StreamingResponse
+from sqlalchemy import select
 
 from app.api.deps import DbSession, require_any_permission, require_permission
+from app.models.document import Document
 from app.models.user import User
 from app.schemas.document import (
     DocumentListResponse,
@@ -20,6 +23,9 @@ from app.services.document import (
     list_documents,
     upload_documents,
 )
+from app.workers.queue import enqueue_document_processing
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
@@ -77,6 +83,22 @@ async def upload_docs(
             metadata={"filename": doc.name, "size": doc.file_size},
         )
 
+    # Enqueue background processing. Upload must succeed even if the queue is
+    # down — failed enqueues stay PENDING and can be retried via process-all.
+    queued = []
+    for doc in uploaded:
+        try:
+            await enqueue_document_processing(doc.id, current_user.organization_id)
+            queued.append(doc)
+        except Exception:
+            logger.warning("Failed to enqueue processing for document %s", doc.id)
+    for doc in queued:
+        doc.processing_status = "QUEUED"
+    if queued:
+        await db.commit()
+        for doc in queued:
+            await db.refresh(doc)
+
     return UploadResponse(
         uploaded=[DocumentResponse.model_validate(d) for d in uploaded],
         skipped=skipped,
@@ -128,7 +150,11 @@ async def download_document(
     )
 
 
-@router.post("/{document_id}/process", response_model=DocumentResponse)
+@router.post(
+    "/{document_id}/process",
+    response_model=DocumentResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+)
 async def process_document_endpoint(
     document_id: uuid.UUID,
     db: DbSession,
@@ -136,23 +162,50 @@ async def process_document_endpoint(
         User, Depends(require_any_permission("documents.view", "documents.view_authorized"))
     ],
 ) -> DocumentResponse:
-    from app.rag.pipeline import process_document
+    """Enqueue (re)processing of a document. Returns 202 — poll status."""
+    doc = await get_document(db, document_id, current_user.organization_id)
+    try:
+        await enqueue_document_processing(doc.id, current_user.organization_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Processing queue unavailable. Try again.",
+        ) from e
 
-    doc = await process_document(db, document_id, current_user.organization_id)
+    doc.processing_status = "QUEUED"
+    doc.processing_error = None
+    await db.commit()
+    await db.refresh(doc)
     return DocumentResponse.model_validate(doc)
 
 
-@router.post("/process-all", response_model=dict)
+@router.post("/process-all", response_model=dict, status_code=status.HTTP_202_ACCEPTED)
 async def process_all_documents(
     db: DbSession,
     current_user: Annotated[
         User, Depends(require_any_permission("documents.view", "documents.view_authorized"))
     ],
 ) -> dict[str, Any]:
-    from app.rag.pipeline import process_pending_documents
-
-    count = await process_pending_documents(db, current_user.organization_id)
-    return {"processed": count}
+    """Enqueue processing for every PENDING document. Returns 202."""
+    result = await db.execute(
+        select(Document).where(
+            Document.organization_id == current_user.organization_id,
+            Document.processing_status == "PENDING",
+            Document.deleted_at.is_(None),
+        )
+    )
+    docs = list(result.scalars().all())
+    queued = 0
+    for doc in docs:
+        try:
+            await enqueue_document_processing(doc.id, current_user.organization_id)
+            doc.processing_status = "QUEUED"
+            queued += 1
+        except Exception:
+            logger.warning("Failed to enqueue processing for document %s", doc.id)
+    if queued:
+        await db.commit()
+    return {"processed": len(docs), "queued": queued}
 
 
 @router.delete("/{document_id}", response_model=DocumentResponse)

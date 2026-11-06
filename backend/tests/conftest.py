@@ -1,4 +1,9 @@
 """Shared test fixtures."""
+import os
+
+# Force test env BEFORE any app import — settings is a module-level singleton
+# and the rate-limit middleware only bypasses limits when APP_ENV == "test".
+os.environ["APP_ENV"] = "test"
 
 import asyncio
 import uuid

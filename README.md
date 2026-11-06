@@ -41,7 +41,19 @@ uv run uvicorn app.main:app --reload --port 8000
 
 API docs: http://localhost:8000/docs
 
-### 4. Setup Frontend
+### 4. Start Background Worker
+
+```bash
+cd backend
+uv run arq app.workers.worker.WorkerSettings
+```
+
+Document processing runs asynchronously through this ARQ worker (Redis queue).
+Status flow: `PENDING → QUEUED → PROCESSING → COMPLETED / FAILED`.
+Uploads auto-enqueue; failed documents can be retried via
+`POST /api/v1/documents/{id}/process` (returns 202 — poll the status endpoint).
+
+### 5. Setup Frontend
 
 ```bash
 cd frontend
@@ -49,7 +61,7 @@ npm install
 cp .env.local.example .env.local  # or create with NEXT_PUBLIC_API_URL
 ```
 
-### 5. Start Frontend
+### 6. Start Frontend
 
 ```bash
 cd frontend
@@ -85,8 +97,9 @@ App: http://localhost:3000
 | POST | /api/v1/auth/refresh | Refresh token |
 | GET/POST | /api/v1/users | User management |
 | GET/POST | /api/v1/collections | Collections CRUD |
-| POST | /api/v1/documents/upload | Upload documents |
-| POST | /api/v1/documents/{id}/process | Trigger RAG processing |
+| POST | /api/v1/documents/upload | Upload documents (auto-queued for processing) |
+| POST | /api/v1/documents/{id}/process | (Re)queue RAG processing — async, 202 |
+| POST | /api/v1/documents/process-all | (Re)queue all PENDING documents — async, 202 |
 | GET | /api/v1/documents | List documents |
 | GET | /api/v1/documents/{id}/download | Download document |
 | POST | /api/v1/chat/conversations | Create conversation |

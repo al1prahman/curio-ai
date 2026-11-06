@@ -34,5 +34,7 @@ async def health_check() -> dict[str, str]:
 @app.on_event("shutdown")
 async def shutdown() -> None:
     from app.services.redis_service import RedisService
+    from app.workers.queue import close_arq_pool
 
     await RedisService.close()
+    await close_arq_pool()
