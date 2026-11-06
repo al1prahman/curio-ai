@@ -132,7 +132,9 @@ async def ask_question(
     # 4. Retrieve relevant chunks (org-isolated + permission-filtered)
     from app.services.permissions import get_authorized_document_ids
 
-    authorized_doc_ids = await get_authorized_document_ids(db, user_id, current_role)
+    authorized_doc_ids = await get_authorized_document_ids(
+        db, user_id, current_role, organization_id
+    )
     vector_store = VectorStore()
     chunks = vector_store.search(
         query_vector=query_vector,

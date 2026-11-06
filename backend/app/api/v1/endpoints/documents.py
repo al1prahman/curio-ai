@@ -11,10 +11,12 @@ from app.api.deps import DbSession, require_any_permission, require_permission
 from app.models.document import Document
 from app.models.user import User
 from app.schemas.document import (
+    BulkVisibilityUpdate,
     DocumentListResponse,
     DocumentResponse,
     DocumentStatusResponse,
     UploadResponse,
+    VisibilityUpdate,
 )
 from app.services.document import (
     delete_document,
@@ -206,6 +208,78 @@ async def process_all_documents(
     if queued:
         await db.commit()
     return {"processed": len(docs), "queued": queued}
+
+
+@router.patch("/{document_id}/visibility", response_model=DocumentResponse)
+async def update_document_visibility(
+    document_id: uuid.UUID,
+    data: VisibilityUpdate,
+    db: DbSession,
+    current_user: Annotated[
+        User, Depends(require_permission("documents.manage_permissions"))
+    ],
+) -> DocumentResponse:
+    """Set document visibility: ALL_EMPLOYEES (default) or RESTRICTED.
+
+    RESTRICTED hides the document from all EMPLOYEE users unless an explicit
+    grant exists on the document.
+    """
+    doc = await get_document(db, document_id, current_user.organization_id)
+    doc.visibility = data.visibility
+    await db.commit()
+    await db.refresh(doc)
+
+    from app.services.audit import log_action
+
+    await log_action(
+        db,
+        organization_id=current_user.organization_id,
+        action="document.visibility",
+        actor_id=current_user.id,
+        resource_type="document",
+        resource_id=doc.id,
+        metadata={"visibility": data.visibility},
+    )
+    return DocumentResponse.model_validate(doc)
+
+
+@router.post("/bulk-visibility", response_model=dict)
+async def bulk_update_visibility(
+    data: BulkVisibilityUpdate,
+    db: DbSession,
+    current_user: Annotated[
+        User, Depends(require_permission("documents.manage_permissions"))
+    ],
+) -> dict[str, Any]:
+    """Set visibility for many documents at once (one click per collection)."""
+    result = await db.execute(
+        select(Document).where(
+            Document.id.in_(data.document_ids),
+            Document.organization_id == current_user.organization_id,
+            Document.deleted_at.is_(None),
+        )
+    )
+    docs = list(result.scalars().all())
+    for doc in docs:
+        doc.visibility = data.visibility
+    await db.commit()
+
+    from app.services.audit import log_action
+
+    await log_action(
+        db,
+        organization_id=current_user.organization_id,
+        action="document.visibility_bulk",
+        actor_id=current_user.id,
+        resource_type="document",
+        resource_id=None,
+        metadata={
+            "visibility": data.visibility,
+            "updated": len(docs),
+            "requested": len(data.document_ids),
+        },
+    )
+    return {"updated": len(docs), "requested": len(data.document_ids)}
 
 
 @router.delete("/{document_id}", response_model=DocumentResponse)

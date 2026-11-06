@@ -1,10 +1,15 @@
 import uuid
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.document import DocumentPermission
+from app.models.document import Document, DocumentPermission
+
+# Visibility values: ALL_EMPLOYEES (default) | RESTRICTED
+VISIBILITY_ALL = "ALL_EMPLOYEES"
+VISIBILITY_RESTRICTED = "RESTRICTED"
+VALID_VISIBILITY = {VISIBILITY_ALL, VISIBILITY_RESTRICTED}
 
 
 async def get_document_permissions(
@@ -84,29 +89,32 @@ async def user_can_access_document(
     user_role: str,
     document_id: uuid.UUID,
 ) -> bool:
-    """Check if a user can access a document.
+    """Check if a user can access a document (visibility model v2).
 
     ADMIN and MANAGER can access all documents in their org.
-    EMPLOYEE can only access documents with explicit permissions.
+    EMPLOYEE can access every document except RESTRICTED ones, unless an
+    explicit grant (user or role) exists on that document.
     """
     if user_role in ("ADMIN", "MANAGER"):
         return True
 
-    # Check explicit user permission
     result = await db.execute(
-        select(DocumentPermission).where(
-            DocumentPermission.document_id == document_id,
-            DocumentPermission.user_id == user_id,
-        )
+        select(Document.visibility).where(Document.id == document_id)
     )
-    if result.scalar_one_or_none() is not None:
+    visibility = result.scalar_one_or_none()
+    if visibility is None:
+        return False
+    if visibility != VISIBILITY_RESTRICTED:
         return True
 
-    # Check role-based permission
+    # RESTRICTED: only explicit grants get back in
     result = await db.execute(
         select(DocumentPermission).where(
             DocumentPermission.document_id == document_id,
-            DocumentPermission.role == user_role,
+            or_(
+                DocumentPermission.user_id == user_id,
+                DocumentPermission.role == user_role,
+            ),
         )
     )
     return result.scalar_one_or_none() is not None
@@ -116,29 +124,39 @@ async def get_authorized_document_ids(
     db: AsyncSession,
     user_id: uuid.UUID,
     user_role: str,
+    organization_id: uuid.UUID,
 ) -> list[uuid.UUID] | None:
     """Get list of document IDs the user can access.
 
-    Returns None for ADMIN/MANAGER (meaning all documents).
-    Returns a list of UUIDs for EMPLOYEE (only authorized documents).
+    Returns None for ADMIN/MANAGER (meaning all documents — no filter).
+    Returns a list of UUIDs for EMPLOYEE: every org document that is not
+    RESTRICTED, plus RESTRICTED documents with an explicit grant for this
+    user or their role. This is the retrieval-level enforcement point.
     """
     if user_role in ("ADMIN", "MANAGER"):
         return None
 
-    # Get documents with explicit user permission
     result = await db.execute(
-        select(DocumentPermission.document_id).where(
-            DocumentPermission.user_id == user_id
+        select(Document.id)
+        .select_from(Document)
+        .outerjoin(
+            DocumentPermission,
+            and_(
+                DocumentPermission.document_id == Document.id,
+                or_(
+                    DocumentPermission.user_id == user_id,
+                    DocumentPermission.role == user_role,
+                ),
+            ),
         )
-    )
-    doc_ids = {row[0] for row in result.all()}
-
-    # Get documents with role-based permission
-    result = await db.execute(
-        select(DocumentPermission.document_id).where(
-            DocumentPermission.role == user_role
+        .where(
+            Document.organization_id == organization_id,
+            Document.deleted_at.is_(None),
+            or_(
+                Document.visibility != VISIBILITY_RESTRICTED,
+                DocumentPermission.id.is_not(None),
+            ),
         )
+        .distinct()
     )
-    doc_ids.update(row[0] for row in result.all())
-
-    return list(doc_ids)
+    return [row[0] for row in result.all()]

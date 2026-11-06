@@ -35,7 +35,9 @@ async def list_documents(
     if user_role == "EMPLOYEE":
         from app.services.permissions import get_authorized_document_ids
 
-        authorized_ids = await get_authorized_document_ids(db, user_id, user_role)
+        authorized_ids = await get_authorized_document_ids(
+            db, user_id, user_role, organization_id
+        )
         if authorized_ids is not None:
             if not authorized_ids:
                 return [], 0

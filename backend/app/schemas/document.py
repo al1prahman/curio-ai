@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -17,10 +18,20 @@ class DocumentResponse(BaseModel):
     file_size: int
     checksum: str
     processing_status: str
+    visibility: str
     processing_error: str | None = None
     page_count: int | None = None
     created_at: datetime
     updated_at: datetime
+
+
+class VisibilityUpdate(BaseModel):
+    visibility: Literal["ALL_EMPLOYEES", "RESTRICTED"]
+
+
+class BulkVisibilityUpdate(BaseModel):
+    document_ids: list[uuid.UUID]
+    visibility: Literal["ALL_EMPLOYEES", "RESTRICTED"]
 
 
 class DocumentListResponse(BaseModel):

@@ -43,6 +43,12 @@ class Document(UUIDMixin, TimestampMixin, Base):
         default="PENDING",
         index=True,
     )
+    visibility: Mapped[str] = mapped_column(
+        String(30),
+        nullable=False,
+        default="ALL_EMPLOYEES",
+        server_default="ALL_EMPLOYEES",
+    )
     processing_error: Mapped[str | None] = mapped_column(Text, nullable=True)
     page_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     deleted_at: Mapped[datetime | None] = mapped_column(
