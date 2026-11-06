@@ -1,0 +1,32 @@
+# slopgate configuration — see https://github.com/al1prahman/slopgate
+mode: block                # block | warn | off
+
+secrets:
+  enabled: true
+  ignore: []               # glob patterns, e.g. '**/*.test.ts'
+
+deps:
+  enabled: true
+  ecosystems: [npm, pypi]
+  registries:
+    npm: https://registry.npmjs.org
+    pypi: https://pypi.org/pypi
+  custom-index: []         # internal registries checked first
+  allowlist: []            # trusted internal package names
+  quarantine: false        # hold installs instead of blocking (v2)
+  typosquat:
+    enabled: true          # warn on young look-alikes of popular packages
+    max-distance: 2        # edits from a popular name (0-5)
+    max-age-days: 90       # packages younger than this look seeded
+  cache:
+    positive-ttl-hours: 24    # how long an "exists" verdict is trusted
+    negative-ttl-minutes: 60  # how long a "missing" verdict is re-checked
+
+python:
+  unmapped-imports: warn   # import names with no known package mapping
+
+imports:
+  enabled: true            # scan import statements, not just manifests
+
+agent:
+  enabled: true            # flag agent-authored commits (Co-Authored-By, "Generated with")
