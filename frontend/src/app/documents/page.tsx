@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Search, Upload } from "lucide-react";
-import { api, type Document } from "@/lib/api";
+import { api, type Document, type User } from "@/lib/api";
 import AppShell from "@/components/AppShell";
 import {
   Badge,
@@ -30,6 +30,9 @@ export default function DocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [self, setSelf] = useState<User | null>(null);
+  const [bulkWorking, setBulkWorking] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -54,6 +57,20 @@ export default function DocumentsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    api.get<User>("/auth/me").then(setSelf).catch(() => {});
+  }, []);
+
+  // Live status poll while any document is QUEUED/PROCESSING
+  useEffect(() => {
+    const busy = documents.some(
+      (d) => d.processing_status === "QUEUED" || d.processing_status === "PROCESSING"
+    );
+    if (!busy) return;
+    const timer = setInterval(load, 3000);
+    return () => clearInterval(timer);
+  }, [documents, load]);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
@@ -93,6 +110,54 @@ export default function DocumentsPage() {
     await load();
   }
 
+  const canManage = self !== null && (self.role === "ADMIN" || self.role === "MANAGER");
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    setSelected((prev) =>
+      prev.size === documents.length
+        ? new Set()
+        : new Set(documents.map((d) => d.id))
+    );
+  }
+
+  async function handleBulkVisibility(visibility: "ALL_EMPLOYEES" | "RESTRICTED") {
+    if (selected.size === 0) return;
+    setBulkWorking(true);
+    try {
+      await api.post("/documents/bulk-visibility", {
+        document_ids: [...selected],
+        visibility,
+      });
+      setSelected(new Set());
+      await load();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Bulk update gagal");
+    } finally {
+      setBulkWorking(false);
+    }
+  }
+
+  async function handleProcessAll() {
+    try {
+      const r = await api.post<{ processed: number; queued: number }>(
+        "/documents/process-all"
+      );
+      if (r.processed === 0) alert("Tidak ada dokumen PENDING.");
+      await load();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Process all gagal");
+    }
+  }
+
   function formatSize(bytes: number) {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -107,6 +172,9 @@ export default function DocumentsPage() {
           description={`${total} document${total !== 1 ? "s" : ""} in your knowledge base`}
           actions={
             <>
+              <Button variant="default" size="sm" onClick={handleProcessAll}>
+                Process pending
+              </Button>
               <input
                 ref={fileRef}
                 type="file"
@@ -158,6 +226,33 @@ export default function DocumentsPage() {
           </select>
         </div>
 
+        {/* Bulk action bar */}
+        {canManage && selected.size > 0 && (
+          <div className="flex items-center gap-2 mb-3 px-3 h-10 bg-sunken rounded-ctrl border border-line">
+            <span className="text-[13px] text-ink">{selected.size} selected</span>
+            <div className="flex-1" />
+            <Button
+              variant="default"
+              size="sm"
+              disabled={bulkWorking}
+              onClick={() => handleBulkVisibility("ALL_EMPLOYEES")}
+            >
+              Allow all
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              disabled={bulkWorking}
+              onClick={() => handleBulkVisibility("RESTRICTED")}
+            >
+              Restrict
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setSelected(new Set())}>
+              Clear
+            </Button>
+          </div>
+        )}
+
         {/* Table */}
         {error ? (
           <Card>
@@ -188,9 +283,21 @@ export default function DocumentsPage() {
             <table className="w-full text-[13px]">
               <thead>
                 <tr className="border-b border-line">
+                  {canManage && (
+                    <th className="w-8 px-2">
+                      <input
+                        type="checkbox"
+                        checked={documents.length > 0 && selected.size === documents.length}
+                        onChange={toggleSelectAll}
+                        className="accent-accent"
+                        aria-label="Select all"
+                      />
+                    </th>
+                  )}
                   <th className="text-left font-medium text-ink-2 text-[12px] px-4 h-9">Name</th>
                   <th className="text-left font-medium text-ink-2 text-[12px] px-4 h-9 w-20">Size</th>
                   <th className="text-left font-medium text-ink-2 text-[12px] px-4 h-9 w-28">Status</th>
+                  <th className="text-left font-medium text-ink-2 text-[12px] px-4 h-9 w-32">Visibility</th>
                   <th className="text-left font-medium text-ink-2 text-[12px] px-4 h-9 w-28">Uploaded</th>
                   <th className="text-right font-medium text-ink-2 text-[12px] px-4 h-9 w-32">Actions</th>
                 </tr>
@@ -201,6 +308,17 @@ export default function DocumentsPage() {
                     key={doc.id}
                     className="border-b border-line last:border-0 hover:bg-sunken/50 transition-colors"
                   >
+                    {canManage && (
+                      <td className="px-2 h-10">
+                        <input
+                          type="checkbox"
+                          checked={selected.has(doc.id)}
+                          onChange={() => toggleSelect(doc.id)}
+                          className="accent-accent"
+                          aria-label={`Select ${doc.name}`}
+                        />
+                      </td>
+                    )}
                     <td className="px-4 h-10 text-ink">
                       <a
                         href={`/documents/${doc.id}`}
@@ -213,6 +331,11 @@ export default function DocumentsPage() {
                     <td className="px-4 h-10">
                       <Badge tone={STATUS_TONES[doc.processing_status] ?? "neutral"}>
                         {doc.processing_status}
+                      </Badge>
+                    </td>
+                    <td className="px-4 h-10">
+                      <Badge tone={doc.visibility === "RESTRICTED" ? "warn" : "ok"}>
+                        {doc.visibility === "RESTRICTED" ? "RESTRICTED" : "ALL"}
                       </Badge>
                     </td>
                     <td className="px-4 h-10 text-ink-2">
