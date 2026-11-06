@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessagesSquare,
+  Users,
 } from "lucide-react";
 import { api, getToken, setToken, type User } from "@/lib/api";
 
@@ -83,6 +84,26 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+
+        {/* Settings (ADMIN only) */}
+        {user.role === "ADMIN" && (
+          <div className="px-2 pb-2 border-t border-line pt-2">
+            <p className="px-3 py-1 text-[11px] font-medium text-ink-3 uppercase tracking-wide">
+              Settings
+            </p>
+            <a
+              href="/settings/users"
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-ctrl text-sm transition-colors ${
+                pathname === "/settings/users"
+                  ? "bg-sunken text-ink font-medium"
+                  : "text-ink-2 hover:bg-sunken hover:text-ink"
+              }`}
+            >
+              <Users size={15} strokeWidth={1.75} />
+              <span>Users</span>
+            </a>
+          </div>
+        )}
 
         {/* User footer */}
         <div className="h-14 px-4 flex items-center border-t border-line">

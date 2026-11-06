@@ -72,6 +72,7 @@ export interface User {
   email: string;
   role: string;
   status: string;
+  last_login_at: string | null;
 }
 
 export interface TokenResponse {
