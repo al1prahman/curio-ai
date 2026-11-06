@@ -74,6 +74,7 @@ App: http://localhost:3000
 
 - Admin: admin@curio.ai / admin123
 - Manager: manager@curio.ai / manager123
+- Employee: budi@curio.ai / budi12345 (for testing the restricted-access flow)
 
 ## Features
 
@@ -85,7 +86,11 @@ App: http://localhost:3000
 - Semantic search with Qdrant
 - AI chat with source citations and conversation history
 - Collections for organizing documents
-- User management (admin)
+- User management (admin) — create/edit/deactivate accounts manually
+- Background document processing (ARQ worker + Redis queue)
+- Document visibility: default `ALL_EMPLOYEES`, admin can restrict sensitive
+  documents to explicit user/role grants — enforced at the Qdrant retrieval
+  level, not just hidden in the UI
 
 ## API Endpoints
 
@@ -101,6 +106,10 @@ App: http://localhost:3000
 | POST | /api/v1/documents/{id}/process | (Re)queue RAG processing — async, 202 |
 | POST | /api/v1/documents/process-all | (Re)queue all PENDING documents — async, 202 |
 | GET | /api/v1/documents | List documents |
+| GET | /api/v1/documents/{id} | Document detail |
+| PATCH | /api/v1/documents/{id}/visibility | Set visibility (ALL_EMPLOYEES / RESTRICTED) |
+| POST | /api/v1/documents/bulk-visibility | Bulk visibility update |
+| GET/POST/DELETE | /api/v1/documents/{id}/permissions[/{perm_id}] | Document access grants |
 | GET | /api/v1/documents/{id}/download | Download document |
 | POST | /api/v1/chat/conversations | Create conversation |
 | POST | /api/v1/chat/conversations/{id}/messages | Ask question (RAG) |
