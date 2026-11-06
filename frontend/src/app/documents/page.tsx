@@ -201,7 +201,14 @@ export default function DocumentsPage() {
                     key={doc.id}
                     className="border-b border-line last:border-0 hover:bg-sunken/50 transition-colors"
                   >
-                    <td className="px-4 h-10 text-ink">{doc.name}</td>
+                    <td className="px-4 h-10 text-ink">
+                      <a
+                        href={`/documents/${doc.id}`}
+                        className="hover:text-accent hover:underline"
+                      >
+                        {doc.name}
+                      </a>
+                    </td>
                     <td className="px-4 h-10 text-ink-2 tabular">{formatSize(doc.file_size)}</td>
                     <td className="px-4 h-10">
                       <Badge tone={STATUS_TONES[doc.processing_status] ?? "neutral"}>

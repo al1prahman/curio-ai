@@ -90,9 +90,11 @@ export interface Document {
   mime_type: string;
   file_size: number;
   processing_status: string;
+  visibility: string;
   processing_error: string | null;
   page_count: number | null;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Collection {
